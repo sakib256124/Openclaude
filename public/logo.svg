@@ -1,0 +1,8 @@
+<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">OpenCloud Compute Console logo</title>
+  <desc id="desc">Original OpenCloud hexagonal cloud mark.</desc>
+  <rect width="160" height="160" rx="32" fill="#091114"/>
+  <path d="M80 20 132 50v60L80 140l-52-30V50L80 20Z" stroke="#2AF5C7" stroke-width="8"/>
+  <path d="M54 93c-10 0-18-8-18-18s8-18 18-18c3-14 15-24 30-24 17 0 31 13 32 30 8 3 14 11 14 20 0 12-10 22-22 22H54Z" fill="#102228" stroke="#7DEBFF" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M66 80h28M80 66v28" stroke="#2AF5C7" stroke-width="8" stroke-linecap="round"/>
+</svg>

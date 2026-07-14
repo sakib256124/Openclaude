@@ -1,0 +1,64 @@
+import { z } from "zod";
+
+export const endpointInterfaceSchema = z.enum(["public", "internal", "admin"]);
+export const roleSchema = z.enum(["ADMIN", "USER", "VIEWER"]);
+
+export const serverEnvSchema = z.object({
+  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  APP_URL: z.string().url(),
+  AUTH_SECRET: z.string().min(32),
+  DATABASE_URL: z.string().min(1),
+  CREDENTIAL_ENCRYPTION_KEY: z.string().min(32),
+  OPENSTACK_DEFAULT_AUTH_URL: z.string().url().optional(),
+  OPENSTACK_DEFAULT_REGION: z.string().default("RegionOne"),
+  OPENSTACK_DEFAULT_INTERFACE: endpointInterfaceSchema.default("public"),
+  OPENSTACK_TLS_VERIFY: z.coerce.boolean().default(true),
+  OPENSTACK_REQUEST_TIMEOUT_MS: z.coerce.number().int().positive().default(30_000),
+  RATE_LIMIT_WINDOW_SECONDS: z.coerce.number().int().positive().default(60),
+  RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(120)
+});
+
+export type ServerEnv = z.infer<typeof serverEnvSchema>;
+
+export const createUserSchema = z.object({
+  name: z.string().trim().min(1).max(120).optional(),
+  email: z.string().trim().email().max(255).transform((value) => value.toLowerCase()),
+  password: z.string().min(12).max(128),
+  role: roleSchema.default("USER"),
+  isActive: z.boolean().default(true)
+});
+
+export const updateUserSchema = z.object({
+  name: z.string().trim().min(1).max(120).nullable().optional(),
+  email: z.string().trim().email().max(255).transform((value) => value.toLowerCase()).optional(),
+  role: roleSchema.optional(),
+  isActive: z.boolean().optional()
+});
+
+export const resetPasswordSchema = z.object({
+  password: z.string().min(12).max(128)
+});
+
+export const generalSettingsSchema = z.object({
+  defaultPageSize: z.coerce.number().int().min(5).max(100),
+  defaultRegion: z.string().trim().max(120).nullable().optional(),
+  defaultProject: z.string().trim().max(120).nullable().optional(),
+  sessionTimeoutMinutes: z.coerce.number().int().min(15).max(24 * 60),
+  defaultRefreshSeconds: z.coerce.number().int().min(5).max(3600),
+  estimatedBillingCurrency: z.string().trim().min(3).max(3),
+  dateTimeFormat: z.string().trim().min(3).max(80),
+  notificationDefaults: z.record(z.boolean()).optional()
+});
+
+export const userPreferenceSchema = z.object({
+  sidebarCollapsed: z.boolean().optional(),
+  expandedNavigation: z.record(z.boolean()).optional(),
+  tableDensity: z.enum(["compact", "comfortable", "spacious"]).optional(),
+  visibleTableColumns: z.record(z.array(z.string())).optional(),
+  defaultFilters: z.record(z.unknown()).optional(),
+  notificationPreferences: z.record(z.boolean()).optional(),
+  reducedMotion: z.boolean().optional(),
+  defaultLaunchChoices: z.record(z.unknown()).optional(),
+  defaultRefreshSeconds: z.coerce.number().int().min(5).max(3600).optional(),
+  tablePageSize: z.coerce.number().int().min(5).max(100).optional()
+});

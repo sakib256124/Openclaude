@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --app-background: #0b1115;
+  --sidebar-background: #10171c;
+  --surface: #131c22;
+  --surface-elevated: #182229;
+  --surface-hover: #1e2a32;
+  --border-color: #293841;
+  --text-primary: #f3f7f9;
+  --text-secondary: #a7b6bf;
+  --text-muted: #758690;
+  --accent: #2dd4bf;
+  --accent-hover: #14b8a6;
+  --accent-subtle: rgba(45, 212, 191, 0.12);
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --information: #60a5fa;
+
+  --background: 202 31% 6%;
+  --foreground: 195 33% 96%;
+  --card: 202 27% 10%;
+  --card-foreground: 195 33% 96%;
+  --border: 199 23% 21%;
+  --input: 199 23% 21%;
+  --ring: 174 72% 56%;
+  --primary: 174 72% 56%;
+  --primary-foreground: 202 31% 6%;
+  --muted: 202 22% 15%;
+  --muted-foreground: 197 17% 70%;
+  --destructive: 0 84% 71%;
+  --destructive-foreground: 0 0% 100%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  min-height: 100vh;
+  background: var(--app-background);
+  color: hsl(var(--foreground));
+  font-size: 14px;
+  line-height: 21px;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.font-mono,
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}

@@ -1,0 +1,230 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+  VIEWER
+}
+
+enum EndpointInterface {
+  public
+  internal
+  admin
+}
+
+enum ActivityStatus {
+  INFO
+  SUCCESS
+  FAILURE
+}
+
+enum OperationStatus {
+  PENDING
+  RUNNING
+  SUCCESS
+  FAILURE
+  CANCELED
+}
+
+enum PricingUnit {
+  VCPU_HOUR
+  GB_RAM_HOUR
+  GB_STORAGE_MONTH
+  FLOATING_IP_HOUR
+  INSTANCE_HOUR
+}
+
+model User {
+  id              String            @id @default(cuid())
+  name            String?
+  email           String            @unique
+  emailVerified   DateTime?
+  image           String?
+  passwordHash    String?
+  role            Role              @default(USER)
+  isActive        Boolean           @default(true)
+  lastLoginAt     DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  accounts        Account[]
+  sessions        Session[]
+  connections     CloudConnection[]
+  activityLogs    ActivityLog[]
+  notifications   Notification[]
+  operations      ResourceOperation[]
+  preferences     UserPreference?
+
+  @@index([role])
+  @@index([isActive])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model CloudConnection {
+  id                                  String            @id @default(cuid())
+  displayName                         String
+  authUrl                             String
+  region                              String
+  endpointInterface                   EndpointInterface @default(public)
+  projectId                           String?
+  applicationCredentialId             String
+  encryptedApplicationCredentialSecret String           @db.Text
+  active                              Boolean           @default(true)
+  ownerUserId                         String
+  owner                               User              @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  createdAt                           DateTime          @default(now())
+  updatedAt                           DateTime          @updatedAt
+
+  @@index([ownerUserId])
+  @@index([active])
+}
+
+model ActivityLog {
+  id           String         @id @default(cuid())
+  userId       String
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action       String
+  resourceType String
+  resourceId   String?
+  resourceName String?
+  service      String?
+  status       ActivityStatus
+  safeMessage  String
+  requestId    String?
+  metadata     Json?
+  createdAt    DateTime       @default(now())
+
+  @@index([userId, createdAt])
+  @@index([resourceType, resourceId])
+  @@index([service])
+  @@index([status])
+}
+
+model ResourceOperation {
+  id           String          @id @default(cuid())
+  userId       String
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action       String
+  resourceType String
+  resourceId   String?
+  status       OperationStatus @default(PENDING)
+  currentStep  String?
+  safeError    String?
+  startedAt    DateTime        @default(now())
+  completedAt  DateTime?
+
+  @@index([userId, startedAt])
+  @@index([resourceType, resourceId])
+  @@index([status])
+}
+
+model PricingRule {
+  id              String      @id @default(cuid())
+  name            String
+  service         String
+  resourceType    String
+  unit            PricingUnit
+  unitPrice       Decimal     @db.Decimal(12, 6)
+  currency        String      @default("USD")
+  region          String?
+  active          Boolean     @default(true)
+  effectiveFrom   DateTime    @default(now())
+  effectiveUntil  DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([service, resourceType, active])
+  @@index([region])
+}
+
+model UserPreference {
+  id                       String   @id @default(cuid())
+  userId                   String   @unique
+  user                     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  theme                    String   @default("dark")
+  sidebarCollapsed         Boolean  @default(false)
+  expandedNavigation       Json?
+  tableDensity             String   @default("comfortable")
+  visibleTableColumns      Json?
+  defaultFilters           Json?
+  notificationPreferences  Json?
+  reducedMotion            Boolean  @default(false)
+  defaultLaunchChoices     Json?
+  defaultRefreshSeconds    Int      @default(15)
+  tablePageSize            Int      @default(20)
+  metadata                 Json?
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+}
+
+model Notification {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type         String
+  title        String
+  safeMessage  String
+  resourceType String?
+  resourceId   String?
+  readAt       DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@index([userId, readAt])
+  @@index([createdAt])
+}
+
+model ApplicationSetting {
+  id                         String   @id @default(cuid())
+  defaultPageSize            Int      @default(20)
+  defaultRegion              String?
+  defaultProject             String?
+  sessionTimeoutMinutes      Int      @default(60)
+  defaultRefreshSeconds      Int      @default(15)
+  estimatedBillingCurrency   String   @default("USD")
+  dateTimeFormat             String   @default("yyyy-MM-dd HH:mm")
+  notificationDefaults       Json?
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+}
