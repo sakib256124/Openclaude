@@ -26,7 +26,7 @@ The core tokens live in `src/app/globals.css`:
 - Mobile navigation uses a slide-over drawer.
 - Navigation groups are collapsible and persisted in local storage.
 - Sidebar collapse state is persisted in local storage.
-- Topbar reserves space for region, project, connection state, refresh, notifications, and user menu.
+- Topbar reserves space for host, workspace, connection state, refresh, notifications, and user menu.
 
 ## Components
 
@@ -48,4 +48,4 @@ Phase 1.5 adds reusable primitives for:
 
 ## Unavailable States
 
-Unavailable states are intentional. They prevent fake OpenStack data from appearing before live service integration exists.
+Unavailable states are intentional. They prevent fake Multipass data from appearing before live service integration exists.

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const endpointInterfaceSchema = z.enum(["public", "internal", "admin"]);
+export const multipassDriverSchema = z.enum(["qemu", "lxd", "hyperv", "virtualbox"]);
 export const roleSchema = z.enum(["ADMIN", "USER", "VIEWER"]);
 
 export const serverEnvSchema = z.object({
@@ -9,11 +9,10 @@ export const serverEnvSchema = z.object({
   AUTH_SECRET: z.string().min(32),
   DATABASE_URL: z.string().min(1),
   CREDENTIAL_ENCRYPTION_KEY: z.string().min(32),
-  OPENSTACK_DEFAULT_AUTH_URL: z.string().url().optional(),
-  OPENSTACK_DEFAULT_REGION: z.string().default("RegionOne"),
-  OPENSTACK_DEFAULT_INTERFACE: endpointInterfaceSchema.default("public"),
-  OPENSTACK_TLS_VERIFY: z.coerce.boolean().default(true),
-  OPENSTACK_REQUEST_TIMEOUT_MS: z.coerce.number().int().positive().default(30_000),
+  MULTIPASS_DEFAULT_HOST: z.string().default("localhost"),
+  MULTIPASS_DEFAULT_DRIVER: multipassDriverSchema.default("qemu"),
+  MULTIPASS_SOCKET_PATH: z.string().optional(),
+  MULTIPASS_REQUEST_TIMEOUT_MS: z.coerce.number().int().positive().default(30_000),
   RATE_LIMIT_WINDOW_SECONDS: z.coerce.number().int().positive().default(60),
   RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(120)
 });

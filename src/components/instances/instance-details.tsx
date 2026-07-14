@@ -50,7 +50,7 @@ export function InstanceDetails({ instanceId }: { instanceId: string }) {
           <CardContent className="space-y-3 text-sm">
             <div className="flex justify-between"><span className="text-muted-foreground">Network</span><span>private-app-net</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Security group</span><span>web-sg</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Floating IP</span><span className="font-mono text-xs">203.0.113.21</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Network address</span><span className="font-mono text-xs">203.0.113.21</span></div>
           </CardContent>
         </Card>
         <Card>

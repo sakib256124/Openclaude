@@ -18,7 +18,7 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <PageHeader
         title="Dashboard"
-        description="Demo cloud overview with sample OpenStack-style resource values for presentation."
+        description="Demo Ubuntu Multipass overview with sample local VM resource values for presentation."
         actions={
           <>
             <LastUpdated value={new Date("2026-07-14T11:45:00")} />
@@ -65,7 +65,7 @@ export default function DashboardPage() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>OpenStack service health</CardTitle>
+            <CardTitle>Multipass service health</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {demoServiceHealth.map((service) => (
@@ -86,7 +86,7 @@ export default function DashboardPage() {
         </div>
         <div className="mt-3 grid gap-2 text-sm text-muted-foreground">
           <p>11:42 - web-prod-01 reboot completed by admin@opencloud.local.</p>
-          <p>11:31 - Floating IP 203.0.113.34 associated with api-prod-02.</p>
+          <p>11:31 - Bridged network address assigned to api-prod-02.</p>
           <p>10:58 - Volume db-primary-data attached to db-primary-01.</p>
         </div>
       </section>

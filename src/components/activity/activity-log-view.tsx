@@ -105,10 +105,10 @@ export function ActivityLogView({ initialLogs }: { initialLogs: ActivityLogRow[]
         >
           <option value="ALL">All services</option>
           <option value="auth">Auth</option>
-          <option value="nova">Nova</option>
-          <option value="neutron">Neutron</option>
-          <option value="cinder">Cinder</option>
-          <option value="glance">Glance</option>
+          <option value="multipass">Multipass</option>
+          <option value="network">Network</option>
+          <option value="storage">Storage</option>
+          <option value="image">Image</option>
         </select>
         <Button variant="secondary" onClick={refresh}>
           Refresh

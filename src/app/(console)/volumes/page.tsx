@@ -14,7 +14,7 @@ const columns = [
 export default function VolumesPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Volumes" description="Demo Cinder block storage listing and attach/detach action state." />
+      <PageHeader title="Volumes" description="Demo Multipass disk and mount listing with attach/detach action state." />
       <ResourceTable
         columns={columns}
         rows={demoVolumes.map(([name, size, status, attached, type]) => [

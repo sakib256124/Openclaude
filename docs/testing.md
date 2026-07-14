@@ -10,20 +10,20 @@ The test folders are scaffolded:
 
 ## Planned Unit Tests
 
-- Keystone token parsing.
-- Service endpoint resolution.
-- OpenStack response normalization.
+- Multipass host config parsing.
+- Command helper validation.
+- Multipass response normalization.
 - Zod validation.
 - Error normalization.
 - Pricing calculations.
 
 ## Planned Integration Tests
 
-Integration tests will mock OpenStack responses for Keystone, Nova, Glance, Neutron, Cinder, and Telemetry.
+Integration tests will mock Multipass CLI responses for list, launch, start, stop, find, networks, mounts, and metrics.
 
 ## Planned E2E Tests
 
-Playwright tests will cover login, dashboard, instance list, launch form, instance action confirmation, error states, and telemetry unavailable states.
+Playwright tests will cover login, dashboard, instance list, launch form, instance action confirmation, error states, and metrics unavailable states.
 
 ## Commands
 

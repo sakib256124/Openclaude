@@ -21,7 +21,7 @@ export function InstanceStatusChart() {
             <div className="text-4xl font-semibold">{total}</div>
             <div className="text-sm text-muted-foreground">Total demo instances</div>
           </div>
-          <div className="text-right text-sm text-muted-foreground">RegionOne</div>
+          <div className="text-right text-sm text-muted-foreground">localhost</div>
         </div>
         <div className="flex h-4 overflow-hidden rounded-full bg-muted">
           {statuses.map((item) => (

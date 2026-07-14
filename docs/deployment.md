@@ -27,5 +27,5 @@ npm run db:seed
 - `CREDENTIAL_ENCRYPTION_KEY must decode to 32 bytes`: generate a new key with `openssl rand -base64 32`.
 - `P1001 Can't reach database server`: start PostgreSQL with `docker compose up -d postgres`.
 - `AUTH_SECRET is too short`: set a random value of at least 32 characters.
-- `No endpoint was found`: verify region and endpoint interface after Keystone integration is added.
+- `No Multipass host was configured`: verify host and driver settings after Multipass integration is added.
 - `next/font` build failures: verify network access during build or configure a local font fallback before offline deployment.

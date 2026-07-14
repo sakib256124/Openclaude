@@ -5,19 +5,19 @@ export type NormalizedErrorCode =
   | "NOT_FOUND"
   | "CONFLICT"
   | "RATE_LIMITED"
-  | "OPENSTACK_ERROR"
+  | "MULTIPASS_ERROR"
   | "SERVICE_UNAVAILABLE"
   | "NETWORK_TIMEOUT"
   | "TLS_ERROR"
-  | "MISSING_ENDPOINT"
-  | "TELEMETRY_UNAVAILABLE";
+  | "MISSING_HOST"
+  | "METRICS_UNAVAILABLE";
 
 export class OpenCloudError extends Error {
   constructor(
     public readonly code: NormalizedErrorCode,
     message: string,
     public readonly statusCode = 500,
-    public readonly openStackRequestId?: string
+    public readonly requestId?: string
   ) {
     super(message);
     this.name = "OpenCloudError";
@@ -29,12 +29,12 @@ export function toSafeErrorResponse(error: unknown) {
     return {
       code: error.code,
       message: error.message,
-      requestId: error.openStackRequestId ?? null
+      requestId: error.requestId ?? null
     };
   }
 
   return {
-    code: "OPENSTACK_ERROR" satisfies NormalizedErrorCode,
+    code: "MULTIPASS_ERROR" satisfies NormalizedErrorCode,
     message: "The request could not be completed.",
     requestId: null
   };

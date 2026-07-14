@@ -12,7 +12,7 @@ const columns = [
 export default function SecurityGroupsPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Security groups" description="Demo Neutron security group rules, presets, and sensitive-port warnings." />
+      <PageHeader title="Security groups" description="Demo firewall rules, presets, and sensitive-port warnings." />
       <ResourceTable
         columns={columns}
         rows={demoSecurityGroups}

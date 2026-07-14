@@ -1,6 +1,6 @@
 # OpenCloud Compute Console
 
-OpenCloud Compute Console is a university final project that provides an EC2-inspired virtual machine management experience using real OpenStack APIs. It is designed as an original dark cloud console for Nova, Glance, Neutron, Cinder, Keystone, and optional Telemetry services.
+OpenCloud Compute Console is a university final project that provides an EC2-inspired virtual machine management experience for Ubuntu Multipass. It is designed as an original dark console for launching, viewing, stopping, deleting, and monitoring local Ubuntu virtual machines.
 
 ## Legal Disclaimer
 
@@ -8,7 +8,7 @@ This is an independent educational project and is not affiliated with, endorsed 
 
 ## Phase 1 and 1.5 Scope
 
-Phase 1 establishes the architecture, folder tree, dependencies, environment template, Docker services, Prisma schema, seed data, route surface, and documentation. Phase 1.5 refines the design system, shell navigation, reusable UI states, and missing navigation routes. Authentication, OpenStack calls, live metrics, and production actions are intentionally scheduled for later phases.
+Phase 1 establishes the architecture, folder tree, dependencies, environment template, Docker services, Prisma schema, seed data, route surface, and documentation. Phase 1.5 refines the design system, shell navigation, reusable UI states, and missing navigation routes. Authentication, Multipass CLI calls, live metrics, and production actions are intentionally scheduled for later phases.
 
 ## Architecture
 
@@ -16,9 +16,9 @@ Phase 1 establishes the architecture, folder tree, dependencies, environment tem
 Browser
   -> Next.js frontend
   -> authenticated Next.js server API route
-  -> server-only OpenStack service layer
-  -> Keystone token and service catalog
-  -> Nova / Glance / Neutron / Cinder / Telemetry
+  -> server-only Multipass service layer
+  -> Ubuntu host connection settings
+  -> Multipass CLI / daemon
   -> normalized application DTO
   -> frontend response
 ```
@@ -48,17 +48,17 @@ Expected output:
 
 ## Environment Variables
 
-Never expose OpenStack credentials through `NEXT_PUBLIC_*` variables. Application credential secrets are stored only server-side and encrypted before persistence.
+Never expose host access secrets through `NEXT_PUBLIC_*` variables. Optional Multipass host secrets are stored only server-side and encrypted before persistence.
 
 Important variables:
 
 - `DATABASE_URL`: PostgreSQL connection string.
 - `AUTH_SECRET`: Auth.js signing secret.
 - `CREDENTIAL_ENCRYPTION_KEY`: 32-byte base64 key for authenticated encryption.
-- `OPENSTACK_DEFAULT_AUTH_URL`: optional default Keystone v3 URL.
-- `OPENSTACK_DEFAULT_REGION`: default OpenStack region.
-- `OPENSTACK_DEFAULT_INTERFACE`: `public`, `internal`, or `admin`.
-- `OPENSTACK_TLS_VERIFY`: must remain true in production.
+- `MULTIPASS_DEFAULT_HOST`: default Ubuntu host, usually `localhost`.
+- `MULTIPASS_DEFAULT_DRIVER`: local Multipass driver such as `qemu` or `lxd`.
+- `MULTIPASS_SOCKET_PATH`: optional daemon socket path.
+- `MULTIPASS_REQUEST_TIMEOUT_MS`: command timeout for server-side Multipass calls.
 
 ## Docker
 
@@ -69,20 +69,20 @@ docker compose up --build
 
 The app is exposed directly on `http://localhost:3000` and through Nginx on `http://localhost:8080`.
 
-## OpenStack Services
+## Multipass Workflows
 
 Planned integrations:
 
-- Keystone Identity API v3 for application credential authentication and service catalog resolution.
-- Nova Compute API for instances, flavors, key pairs, actions, and snapshots.
-- Glance Image API v2 for usable active images.
-- Neutron Networking API v2 for networks, subnets, ports, floating IPs, and security groups.
-- Cinder Block Storage API v3 for volumes and attachments.
-- Ceilometer or Gnocchi only when available for real utilization metrics.
+- `multipass list --format json` for VM inventory.
+- `multipass launch` for Ubuntu VM creation with CPU, memory, disk, and image choices.
+- `multipass start`, `stop`, `restart`, `suspend`, and `delete` for instance actions.
+- `multipass find` for available Ubuntu images.
+- `multipass networks`, `mount`, and `umount` for networking and storage workflows.
+- Optional host sampling for CPU, memory, disk, and network utilization metrics.
 
 ## Security Notes
 
-OpenStack requests must originate from server-side modules and route handlers only. Phase 1 includes server-only module boundaries, authenticated encryption helpers, strict environment validation, security headers, and database models for role-based access and safe activity logs.
+Multipass commands must originate from server-side modules and route handlers only. Phase 1 includes server-only module boundaries, authenticated encryption helpers, strict environment validation, security headers, and database models for role-based access and safe activity logs.
 
 ## Testing
 
@@ -97,10 +97,10 @@ Unit, integration, and end-to-end test suites are scaffolded in `tests/`. Concre
 ## Known Limitations
 
 - Login is not active until Phase 2.
-- Keystone token acquisition starts in Phase 3.
-- Nova, Glance, Neutron, Cinder, and Telemetry endpoints currently return explicit `501` phase responses.
+- Multipass CLI connection and command execution starts in Phase 3.
+- VM, image, network, storage, and metrics endpoints currently return explicit `501` phase responses.
 - No fake utilization metrics are displayed.
-- Phase 1.5 pages use designed unavailable states until real OpenStack integration exists.
+- Phase 1.5 pages use designed unavailable states until real Multipass integration exists.
 
 ## Screenshots
 

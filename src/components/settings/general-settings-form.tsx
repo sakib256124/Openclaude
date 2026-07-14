@@ -80,7 +80,7 @@ export function GeneralSettingsForm({
               />
             </label>
             <label className="grid gap-2 text-sm">
-              Default region
+              Default host
               <input
                 className="h-10 rounded-md border bg-background px-3"
                 value={settings.defaultRegion ?? ""}
@@ -88,7 +88,7 @@ export function GeneralSettingsForm({
               />
             </label>
             <label className="grid gap-2 text-sm">
-              Default project
+              Default workspace
               <input
                 className="h-10 rounded-md border bg-background px-3"
                 value={settings.defaultProject ?? ""}

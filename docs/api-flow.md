@@ -1,6 +1,6 @@
 # API Flow
 
-Browser components never call OpenStack directly. They call local `/api/*` route handlers, and those handlers call server-only modules under `src/lib/openstack`.
+Browser components never call Multipass directly. They call local `/api/*` route handlers, and those handlers call server-only modules under `src/lib/multipass`.
 
 ## Implemented in Phase 1
 
@@ -25,5 +25,5 @@ Example response:
 ## Common Errors and Fixes
 
 - `401`: the application session is missing or expired. This is handled in Phase 2.
-- `503 MISSING_ENDPOINT`: the Keystone service catalog does not contain a requested endpoint for the configured region and interface.
-- `TELEMETRY_UNAVAILABLE`: Ceilometer or Gnocchi is absent; the UI must show a clear unavailable state instead of fake values.
+- `503 MISSING_HOST`: no Ubuntu Multipass host has been configured.
+- `METRICS_UNAVAILABLE`: host sampling is unavailable; the UI must show a clear unavailable state instead of fake values.

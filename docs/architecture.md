@@ -1,6 +1,6 @@
 # Architecture
 
-OpenCloud Compute Console keeps OpenStack as the source of truth. The local database stores application users, encrypted cloud connections, audit logs, preferences, and local pricing rules. It does not duplicate full OpenStack server, network, floating IP, or volume state.
+OpenCloud Compute Console keeps Ubuntu Multipass as the source of truth for VM state. The local database stores application users, encrypted host connection settings, audit logs, preferences, and local pricing rules. It does not duplicate full Multipass instance, image, network, or mount state.
 
 ## Request Flow
 
@@ -8,10 +8,9 @@ OpenCloud Compute Console keeps OpenStack as the source of truth. The local data
 Browser
   -> Next.js route or React component
   -> /api/* route handler with application authentication
-  -> server-only OpenStack module
-  -> Keystone application credential token
-  -> service catalog endpoint resolution
-  -> OpenStack service API
+  -> server-only Multipass module
+  -> Ubuntu host connection resolution
+  -> Multipass CLI or daemon call
   -> normalized DTO
   -> JSON response
 ```
@@ -62,14 +61,14 @@ opencloud/
         volumes/[volumeId]/detach/route.ts
         metrics/route.ts
         activity-logs/route.ts
-        health/openstack/route.ts
+        health/multipass/route.ts
     components/
       layout/
       dashboard/
       instances/
       ui/
     lib/
-      openstack/
+      multipass/
       auth.ts
       prisma.ts
       encryption.ts
@@ -94,4 +93,4 @@ opencloud/
 
 ## Phase Responsibilities
 
-Phase 1 creates the foundation. Phase 1.5 refines the design system, application shell, reusable UI states, grouped navigation, and missing route placeholders. Phase 2 adds authentication and database-backed sessions. Phase 3 implements Keystone and token caching. Phases 4 through 8 add OpenStack service integrations. Phase 9 completes testing, deployment polish, and final documentation.
+Phase 1 creates the foundation. Phase 1.5 refines the design system, application shell, reusable UI states, grouped navigation, and missing route placeholders. Phase 2 adds authentication and database-backed sessions. Phase 3 implements Multipass host connection checks. Phases 4 through 8 add VM, image, network, storage, and metrics integrations. Phase 9 completes testing, deployment polish, and final documentation.

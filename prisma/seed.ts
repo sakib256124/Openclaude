@@ -90,7 +90,7 @@ async function main() {
     create: {
       id: "default",
       defaultPageSize: 20,
-      defaultRegion: process.env.OPENSTACK_DEFAULT_REGION ?? "RegionOne",
+      defaultRegion: process.env.MULTIPASS_DEFAULT_HOST ?? "localhost",
       defaultProject: null,
       sessionTimeoutMinutes: 60,
       defaultRefreshSeconds: 15,
@@ -108,33 +108,33 @@ async function main() {
     skipDuplicates: true,
     data: [
       {
-        name: "Default vCPU hourly estimate",
-        service: "nova",
+        name: "Default VM vCPU hourly estimate",
+        service: "multipass",
         resourceType: "vcpu",
         unit: "VCPU_HOUR",
         unitPrice: "0.025",
         currency: "USD"
       },
       {
-        name: "Default RAM hourly estimate",
-        service: "nova",
+        name: "Default VM RAM hourly estimate",
+        service: "multipass",
         resourceType: "ram_gb",
         unit: "GB_RAM_HOUR",
         unitPrice: "0.008",
         currency: "USD"
       },
       {
-        name: "Default block storage monthly estimate",
-        service: "cinder",
+        name: "Default local storage monthly estimate",
+        service: "multipass",
         resourceType: "volume_gb",
         unit: "GB_STORAGE_MONTH",
         unitPrice: "0.10",
         currency: "USD"
       },
       {
-        name: "Default floating IP hourly estimate",
-        service: "neutron",
-        resourceType: "floating_ip",
+        name: "Default bridged network hourly estimate",
+        service: "multipass",
+        resourceType: "bridged_network",
         unit: "FLOATING_IP_HOUR",
         unitPrice: "0.004",
         currency: "USD"

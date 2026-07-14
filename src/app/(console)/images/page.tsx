@@ -14,7 +14,7 @@ const columns = [
 export default function ImagesPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Images" description="Demo Glance image inventory with filters, metadata, and selection safety." />
+      <PageHeader title="Images" description="Demo Multipass image inventory with filters, metadata, and selection safety." />
       <ResourceTable
         columns={columns}
         rows={demoImages.map(([name, os, status, size, updated]) => [name, os, <StatusBadge key={status} status={status} />, size, updated])}

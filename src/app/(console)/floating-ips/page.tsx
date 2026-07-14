@@ -4,7 +4,7 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { demoFloatingIps } from "@/lib/demo-data";
 
 const columns = [
-  { key: "floatingIp", label: "Floating IP", sortable: true },
+  { key: "address", label: "Address", sortable: true },
   { key: "instance", label: "Associated instance" },
   { key: "privateIp", label: "Private IP" },
   { key: "status", label: "Status" }
@@ -13,7 +13,7 @@ const columns = [
 export default function FloatingIpsPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Floating IPs" description="Demo Neutron allocation, association, disassociation, and release overview." />
+      <PageHeader title="Addresses" description="Demo bridged address assignment, association, disassociation, and release overview." />
       <ResourceTable
         columns={columns}
         rows={demoFloatingIps.map(([floatingIp, instance, privateIp, status]) => [
@@ -22,8 +22,8 @@ export default function FloatingIpsPage() {
           <span key={privateIp} className="font-mono text-xs text-muted-foreground">{privateIp}</span>,
           <StatusBadge key={status} status={status} />
         ])}
-        emptyTitle="No floating IPs"
-        emptyDescription="No demo floating IPs available."
+        emptyTitle="No addresses"
+        emptyDescription="No demo addresses available."
       />
     </div>
   );

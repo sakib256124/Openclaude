@@ -13,10 +13,11 @@ enum Role {
   VIEWER
 }
 
-enum EndpointInterface {
-  public
-  internal
-  admin
+enum MultipassDriver {
+  qemu
+  lxd
+  hyperv
+  virtualbox
 }
 
 enum ActivityStatus {
@@ -55,7 +56,7 @@ model User {
   updatedAt       DateTime          @updatedAt
   accounts        Account[]
   sessions        Session[]
-  connections     CloudConnection[]
+  connections     MultipassConnection[]
   activityLogs    ActivityLog[]
   notifications   Notification[]
   operations      ResourceOperation[]
@@ -102,20 +103,18 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-model CloudConnection {
-  id                                  String            @id @default(cuid())
-  displayName                         String
-  authUrl                             String
-  region                              String
-  endpointInterface                   EndpointInterface @default(public)
-  projectId                           String?
-  applicationCredentialId             String
-  encryptedApplicationCredentialSecret String           @db.Text
-  active                              Boolean           @default(true)
-  ownerUserId                         String
-  owner                               User              @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
-  createdAt                           DateTime          @default(now())
-  updatedAt                           DateTime          @updatedAt
+model MultipassConnection {
+  id                     String          @id @default(cuid())
+  displayName            String
+  host                   String
+  driver                 MultipassDriver @default(qemu)
+  socketPath             String?
+  encryptedAccessSecret  String?         @db.Text
+  active                 Boolean         @default(true)
+  ownerUserId            String
+  owner                  User            @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
 
   @@index([ownerUserId])
   @@index([active])

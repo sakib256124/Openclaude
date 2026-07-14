@@ -14,7 +14,7 @@ const columns = [
 export default function SnapshotsPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Snapshots" description="Demo Glance-backed instance snapshots separated from Cinder volume snapshots." />
+      <PageHeader title="Snapshots" description="Demo Multipass instance snapshots separated from storage snapshots." />
       <ResourceTable
         columns={columns}
         rows={demoInstanceSnapshots.map(([name, source, status, size, created]) => [

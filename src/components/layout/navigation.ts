@@ -56,7 +56,7 @@ export const navigationGroups: NavigationGroup[] = [
     label: "Network",
     items: [
       { href: "/networks", label: "Networks", icon: Network },
-      { href: "/floating-ips", label: "Floating IPs", icon: Globe2 },
+      { href: "/floating-ips", label: "Addresses", icon: Globe2 },
       { href: "/security-groups", label: "Security Groups", icon: Shield }
     ]
   },
@@ -82,7 +82,7 @@ export const navigationGroups: NavigationGroup[] = [
     id: "administration",
     label: "Administration",
     items: [
-      { href: "/settings/openstack", label: "Cloud Connection", icon: CloudCog },
+      { href: "/settings/multipass", label: "Multipass Host", icon: CloudCog },
       { href: "/settings/users", label: "Users and Roles", icon: UserCog },
       { href: "/settings/general", label: "Settings", icon: Settings },
       { href: "/settings/general#preferences", label: "Preferences", icon: SlidersHorizontal }

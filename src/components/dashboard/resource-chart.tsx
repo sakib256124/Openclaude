@@ -35,7 +35,7 @@ export function ResourceChart() {
             </div>
           ))}
         </div>
-        <p className="text-xs text-muted-foreground">Demo sample based on OpenStack-style telemetry overview.</p>
+        <p className="text-xs text-muted-foreground">Demo sample based on Multipass host resource overview.</p>
       </CardContent>
     </Card>
   );

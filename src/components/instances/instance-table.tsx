@@ -14,7 +14,7 @@ const columns = [
   { key: "image", label: "Image" },
   { key: "flavor", label: "Flavor" },
   { key: "privateIp", label: "Private IP" },
-  { key: "floatingIp", label: "Floating IP" },
+  { key: "floatingIp", label: "Address" },
   { key: "az", label: "Availability Zone" },
   { key: "created", label: "Created", sortable: true },
   { key: "actions", label: "Actions" }

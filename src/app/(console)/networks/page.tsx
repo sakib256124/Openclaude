@@ -14,7 +14,7 @@ const columns = [
 export default function NetworksPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Networks" description="Demo Neutron network, subnet, port, and connected-resource view." />
+      <PageHeader title="Networks" description="Demo Multipass network, subnet, interface, and connected-resource view." />
       <ResourceTable
         columns={columns}
         rows={demoNetworks.map(([name, cidr, status, ports, router]) => [name, cidr, <StatusBadge key={status} status={status} />, ports, router])}

@@ -14,7 +14,7 @@ const columns = [
 export default function VolumeSnapshotsPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Volume Snapshots" description="Demo Cinder volume snapshots managed separately from Glance instance snapshots." />
+      <PageHeader title="Volume Snapshots" description="Demo storage snapshots managed separately from instance snapshots." />
       <ResourceTable
         columns={columns}
         rows={demoVolumeSnapshots.map(([name, volume, status, size, created]) => [

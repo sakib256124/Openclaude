@@ -2,9 +2,9 @@
 
 Security goals for this project:
 
-- Use Keystone application credentials, not OpenStack user passwords.
-- Keep all OpenStack secrets on the server.
-- Encrypt application credential secrets before storing them.
+- Use server-side Multipass host settings, not browser-side shell access.
+- Keep all host access secrets on the server.
+- Encrypt optional host access secrets before storing them.
 - Redact tokens, database passwords, encryption keys, and credential secrets from logs.
 - Validate environment variables and request payloads with Zod.
 - Enforce role-based access for `ADMIN`, `USER`, and `VIEWER`.
@@ -14,12 +14,12 @@ Security goals for this project:
 
 ## Phase 1 Controls
 
-Phase 1 includes encrypted credential helpers, environment schemas, Prisma models for roles and audit logs, server-only OpenStack module imports, and middleware security headers.
+Phase 1 includes encrypted credential helpers, environment schemas, Prisma models for roles and audit logs, server-only Multipass module imports, and middleware security headers.
 
 ## Phase 1.5 Controls
 
-Phase 1.5 preserves unavailable states for API-driven sections. It does not add fake OpenStack data, does not move OpenStack calls into browser components, and keeps all cloud integration modules server-only.
+Phase 1.5 preserves unavailable states for API-driven sections. It does not add fake Multipass data, does not move Multipass calls into browser components, and keeps all VM integration modules server-only.
 
 ## Production Notes
 
-`OPENSTACK_TLS_VERIFY` must remain true in production. Do not commit `.env`, database dumps, Keystone tokens, application credential secrets, screenshots containing secrets, or local Docker volumes.
+Do not commit `.env`, database dumps, host access secrets, screenshots containing secrets, or local Docker volumes.

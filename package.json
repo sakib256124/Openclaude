@@ -2,7 +2,7 @@
   "name": "opencloud-compute-console",
   "version": "0.1.0",
   "private": true,
-  "description": "OpenCloud Compute Console: an EC2-inspired virtual machine management dashboard using OpenStack APIs.",
+  "description": "OpenCloud Compute Console: an EC2-inspired virtual machine management dashboard for Ubuntu Multipass.",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",

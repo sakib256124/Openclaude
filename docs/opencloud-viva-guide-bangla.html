@@ -162,17 +162,17 @@
 
         <div class="script">
           Sir, amar project-er naam OpenCloud Compute Console. Amake EC2-er moto ekta cloud compute console banate bola
-          hoyechilo. Ami eta AWS diye kori nai; eta OpenStack-based EC2-inspired prototype. Ekhane EC2 console-er main
+          hoyechilo. Ami eta AWS diye kori nai; eta Ubuntu Multipass-based EC2-inspired prototype. Ekhane EC2 console-er main
           workflow-gulo rakha hoyeche: dashboard, instances, launch instance, key pairs, images, security groups,
-          volumes, floating IP, monitoring, billing, user role and settings. Current version-e UI, authentication,
-          database, role permission, audit log and API structure ready ache. Real OpenStack API integration phase-wise
+          volumes, network address, monitoring, billing, user role and settings. Current version-e UI, authentication,
+          database, role permission, audit log and API structure ready ache. Real Multipass CLI integration phase-wise
           complete korte hobe.
         </div>
 
         <div class="box warning">
           <h3>Important line</h3>
           <p>
-            Full AWS EC2 clone bolben na. Bolben: <strong>EC2-inspired OpenStack compute console prototype</strong>.
+            Full AWS EC2 clone bolben na. Bolben: <strong>EC2-inspired Ubuntu Multipass VM console prototype</strong>.
             Eita honest and technically strong.
           </p>
         </div>
@@ -185,7 +185,7 @@
           <h3>Short Answer</h3>
           <p class="answer">
             Sir, eta full production EC2 clone na, eta EC2 console-er core idea follow kore banano academic prototype.
-            EC2-er moto compute resource management-er pages and workflows ekhane ache. Backend AWS-er bodole OpenStack
+            EC2-er moto compute resource management-er pages and workflows ekhane ache. Backend AWS-er bodole Multipass
             API target kore design kora.
           </p>
         </div>
@@ -195,14 +195,14 @@
           <ul>
             <li>EC2-te instance launch, key pair, security group, image, volume, IP, monitoring thake.</li>
             <li>Amar console-e oi same module-gular page, UI flow and API route structure ache.</li>
-            <li>AWS API use korini, karon AWS proprietary platform. Instead OpenStack open-source cloud API use korar plan.</li>
+            <li>AWS API use korini, karon AWS proprietary platform. Instead Ubuntu Multipass CLI/daemon use korar plan.</li>
             <li>Current demo-te safe placeholder ache, fake running VM dekhano hoyni.</li>
           </ul>
         </div>
 
         <div class="script">
           Sir, clone mane ami exact AWS copy kori nai. Ami EC2-er workflow clone korechi: instance manage, key pair,
-          security group, image, volume, floating IP and monitoring. Backend architecture OpenStack-er jonno ready,
+          security group, image, volume, network address and monitoring. Backend architecture Multipass-er jonno ready,
           tai eta vendor-neutral private cloud console hisebe kaj korbe.
         </div>
       </section>
@@ -213,7 +213,7 @@
         <div class="box">
           <h3>Question: Ei project-er main objective ki?</h3>
           <p class="answer">
-            Ei project-er main objective holo OpenStack cloud resources manage korar jonno ekta secure web dashboard
+            Ei project-er main objective holo Ubuntu Multipass VM manage korar jonno ekta secure web dashboard
             banano. User login kore ek jayga theke instance, image, network, volume, security group, monitoring,
             billing estimate and activity logs dekhte parbe.
           </p>
@@ -235,14 +235,14 @@
       </section>
 
       <section>
-        <h2>4. AWS vs OpenStack Answer</h2>
+        <h2>4. AWS vs Ubuntu Multipass Answer</h2>
 
         <div class="box">
-          <h3>Question: AWS ar OpenStack-er moddhe difference ki?</h3>
+          <h3>Question: AWS ar Ubuntu Multipass-er moddhe difference ki?</h3>
           <p class="answer">
-            AWS holo Amazon-er public cloud provider. User Amazon-er infrastructure rent kore. OpenStack holo open-source
+            AWS holo Amazon-er public cloud provider. User Amazon-er infrastructure rent kore. Ubuntu Multipass holo local VM manager
             cloud platform, ja nijer server/private cloud/lab environment-e deploy kora jay. Amar project AWS-er official
-            API use kore na; eta OpenStack API target kore.
+            API use kore na; eta Multipass CLI target kore.
           </p>
         </div>
 
@@ -257,11 +257,11 @@
             </ul>
           </div>
           <div class="box">
-            <h3>OpenStack</h3>
+            <h3>Multipass</h3>
             <ul>
               <li>Open-source cloud platform</li>
               <li>Private cloud possible</li>
-              <li>Nova, Glance, Neutron, Cinder</li>
+              <li>Multipass VM, Multipass image, Multipass network, Multipass storage</li>
               <li>University/lab/server environment-e useful</li>
             </ul>
           </div>
@@ -269,19 +269,19 @@
 
         <div class="script">
           Sir, EC2 hocche AWS-er compute service. Ami oi compute console-er concept follow korechi, but backend-e
-          OpenStack Nova use korar architecture rekhechi.
+          Multipass VM command layer use korar architecture rekhechi.
         </div>
       </section>
 
       <section>
-        <h2>5. Browser Theke Direct OpenStack Call Na Korar Karon</h2>
+        <h2>5. Browser Theke Direct Multipass Call Na Korar Karon</h2>
 
         <div class="box">
-          <h3>Question: Browser theke sorasori OpenStack call na korar karon ki?</h3>
+          <h3>Question: Browser theke sorasori Multipass call na korar karon ki?</h3>
           <p class="answer">
-            Browser theke direct OpenStack API call korle credential, token, endpoint and secret expose hoye jete pare.
+            Browser theke direct Multipass command call korle host access, command control, and secret expose hoye jete pare.
             Tai browser sudhu amar Next.js API route call kore. Server-side route authentication, permission, validation
-            check kore tarpor OpenStack layer call korbe.
+            check kore tarpor Multipass layer call korbe.
           </p>
         </div>
 
@@ -291,7 +291,7 @@
             <li>User browser theke button click kore.</li>
             <li>Request jay local Next.js API route-e.</li>
             <li>API route user session and role check kore.</li>
-            <li>Server-only OpenStack module cloud API call kore.</li>
+            <li>Server-only Multipass module CLI/daemon call kore.</li>
             <li>Normalized response UI-te return hoy.</li>
           </ol>
         </div>
@@ -310,7 +310,7 @@
           <p class="answer">
             Auth.js use korechi authentication and session management-er jonno. Prisma use korechi database schema,
             migration and query type-safe vabe manage korar jonno. PostgreSQL use korechi reliable relational database
-            hisebe, jekhane user, role, settings, activity log and cloud connection data store kora jay.
+            hisebe, jekhane user, role, settings, activity log and host connection data store kora jay.
           </p>
         </div>
 
@@ -365,9 +365,9 @@
         <h2>8. Password and Cloud Credential Security</h2>
 
         <div class="box">
-          <h3>Question: Password and cloud credential kivabe secure?</h3>
+          <h3>Question: Password and host access secret kivabe secure?</h3>
           <p class="answer">
-            Password database-e plain text hisebe rakha hoy na. bcrypt diye hash kore rakha hoy. Cloud credential
+            Password database-e plain text hisebe rakha hoy na. bcrypt diye hash kore rakha hoy. Host access secret
             server-side thake, public environment variable-e rakha hoy na. Secret encrypt korar jonno AES-256-GCM helper
             ache, jeta IV, auth tag and encrypted payload use kore.
           </p>
@@ -379,12 +379,12 @@
             <li>Security headers middleware theke set hoy.</li>
             <li>Zod validation use hoy.</li>
             <li>Audit log safe message store kore, secret store kore na.</li>
-            <li>OpenStack modules server-only import diye protected.</li>
+            <li>Multipass modules server-only import diye protected.</li>
           </ul>
         </div>
 
         <div class="script">
-          Sir, amar project-e security layer multiple level-e: password hash, encrypted cloud credential, role permission,
+          Sir, amar project-e security layer multiple level-e: password hash, encrypted host access secret, role permission,
           API validation and audit log.
         </div>
       </section>
@@ -396,7 +396,7 @@
           <h3>Question: Current limitation ki?</h3>
           <p class="answer">
             Current version-e authentication, role management, UI shell, settings, activity log and API structure ready.
-            Kintu live OpenStack operation fully connected na. Instances, key pair, images, networks, volumes and metrics
+            Kintu live Multipass operation fully connected na. Instances, key pair, images, networks, volumes and metrics
             route currently phase placeholder response dite pare.
           </p>
         </div>
@@ -404,11 +404,11 @@
         <div class="box">
           <h3>Next phase-e ki korben?</h3>
           <ol>
-            <li>Keystone application credential login and token cache.</li>
-            <li>Nova diye real instance list, launch, start, stop, reboot, delete.</li>
-            <li>Glance image and flavor list.</li>
-            <li>Neutron network, floating IP, security group.</li>
-            <li>Cinder volume create, attach, detach.</li>
+            <li>host access host setting login and token cache.</li>
+            <li>Multipass VM diye real instance list, launch, start, stop, reboot, delete.</li>
+            <li>Multipass image and size profile list.</li>
+            <li>Multipass network, bridged address, and firewall workflow.</li>
+            <li>Multipass storage mount, unmount, and disk workflow.</li>
             <li>Telemetry metrics available thakle monitoring.</li>
           </ol>
         </div>
@@ -444,7 +444,7 @@
             <strong>Security Groups/Key Pairs:</strong> bolben EC2-er security model-er moto access control resource.
           </li>
           <li>
-            <strong>Volumes/Floating IP:</strong> bolben storage and public IP management-er section.
+            <strong>Volumes/Network Address:</strong> bolben storage and public IP management-er section.
           </li>
           <li>
             <strong>Users and Roles:</strong> admin role diye user management dekhate hobe.
@@ -453,7 +453,7 @@
             <strong>User login:</strong> rakib@gmail.com / 111111 diye normal user perspective dekhate paren.
           </li>
           <li>
-            <strong>Limitations:</strong> honestly bolben real OpenStack integration next phase.
+            <strong>Limitations:</strong> honestly bolben real Multipass integration next phase.
           </li>
         </ol>
       </section>
@@ -465,7 +465,7 @@
           <h3>Q: Eta ki fully functional?</h3>
           <p class="answer">
             Fully production functional na. Eta academic prototype where UI, auth, database, permission and API
-            architecture ready. Real OpenStack integration remaining.
+            architecture ready. Real Multipass integration remaining.
           </p>
         </div>
 
@@ -478,10 +478,10 @@
         </div>
 
         <div class="box">
-          <h3>Q: Database keno dorkar, OpenStack-e to data ache?</h3>
+          <h3>Q: Database keno dorkar, Multipass-e to data ache?</h3>
           <p class="answer">
-            OpenStack resource state OpenStack-e thakbe. Local database user, session, role, settings, audit log,
-            notification and encrypted cloud connection data store korar jonno.
+            Multipass resource state Multipass-e thakbe. Local database user, session, role, settings, audit log,
+            notification and encrypted host connection data store korar jonno.
           </p>
         </div>
 
@@ -499,18 +499,18 @@
 
         <div class="script">
           Sir, overall amar project holo OpenCloud Compute Console. Eta EC2-inspired cloud compute dashboard, but AWS-er
-          bodole OpenStack API target kore design kora. Current version-e ami UI shell, dashboard, instances, key pairs,
+          bodole Multipass CLI target kore design kora. Current version-e ami UI shell, dashboard, instances, key pairs,
           images, network, volume, monitoring, billing, settings and user-role management-er structure ready korechi.
           Authentication Auth.js diye, database PostgreSQL and Prisma diye, permission role-based, password bcrypt diye
-          secure, and future cloud credential encryption-er helper ache. Browser direct OpenStack call kore na; sob request
-          protected Next.js API route diye server-side OpenStack layer-e jabe. Real OpenStack API integration ekhono next
+          secure, and future host access secret encryption-er helper ache. Browser direct Multipass call kore na; sob request
+          protected Next.js API route diye server-side Multipass layer-e jabe. Real Multipass CLI integration ekhono next
           phase, but architecture and demo workflow EC2 console-er moto ready.
         </div>
 
         <div class="box warning">
           <h3>Last tip</h3>
           <p>
-            Sir-ke “complete AWS EC2 clone” na bole “EC2-inspired OpenStack prototype” bolben. Ete apnar work realistic,
+            Sir-ke “complete AWS EC2 clone” na bole “EC2-inspired Multipass prototype” bolben. Ete apnar work realistic,
             honest and technically mature mone hobe.
           </p>
         </div>

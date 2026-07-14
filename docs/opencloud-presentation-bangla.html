@@ -251,14 +251,14 @@
       <p class="eyebrow">Final Project Presentation</p>
       <h1>OpenCloud Compute Console</h1>
       <p class="subtitle">
-        OpenStack cloud resources manage করার জন্য একটি secure, role-based, EC2-inspired web dashboard.
+        Ubuntu Multipass VM manage করার জন্য একটি secure, role-based, EC2-inspired web dashboard.
       </p>
       <div class="pill-row">
         <span class="pill">Next.js</span>
         <span class="pill">TypeScript</span>
         <span class="pill">PostgreSQL</span>
         <span class="pill">Prisma</span>
-        <span class="pill">OpenStack APIs</span>
+        <span class="pill">Multipass CLI</span>
       </div>
       <div class="footer"><span>OpenCloud Compute Console</span><span>Slide 1</span></div>
     </section>
@@ -269,7 +269,7 @@
       <div class="grid">
         <div class="box">
           <h3>Problem</h3>
-          <p>OpenStack resources manage করার জন্য সাধারণ user-friendly web console দরকার।</p>
+          <p>Ubuntu Multipass VM manage করার জন্য সাধারণ user-friendly web console দরকার।</p>
         </div>
         <div class="box">
           <h3>Solution</h3>
@@ -281,7 +281,7 @@
         </div>
         <div class="box">
           <h3>Important Point</h3>
-          <p>এটি AWS নয়; UI inspiration EC2-style, কিন্তু backend target OpenStack API.</p>
+          <p>এটি AWS নয়; UI inspiration EC2-style, কিন্তু backend target Multipass CLI.</p>
         </div>
       </div>
       <div class="footer"><span>Project Overview</span><span>Slide 2</span></div>
@@ -297,7 +297,7 @@
         </div>
         <div class="box">
           <h3>Backend</h3>
-          <p>Next.js API routes, server-only OpenStack service layer, Zod validation.</p>
+          <p>Next.js API routes, server-only Multipass service layer, Zod validation.</p>
         </div>
         <div class="box">
           <h3>Database</h3>
@@ -327,37 +327,37 @@
         <div class="step">Next.js Page</div>
         <div class="step">/api Route</div>
         <div class="step">Auth + RBAC</div>
-        <div class="step">OpenStack Layer</div>
+        <div class="step">Multipass Layer</div>
         <div class="step">JSON Response</div>
       </div>
       <p class="note">
-        Browser কখনো সরাসরি OpenStack API call করে না। সব request protected server-side API route দিয়ে যায়।
+        Browser কখনো সরাসরি Multipass command call করে না। সব request protected server-side API route দিয়ে যায়।
       </p>
       <div class="footer"><span>Architecture</span><span>Slide 4</span></div>
     </section>
 
     <section class="slide">
-      <p class="eyebrow">OpenStack Integration Plan</p>
-      <h2>OpenStack services mapping</h2>
+      <p class="eyebrow">Multipass Integration Plan</p>
+      <h2>Multipass workflow mapping</h2>
       <div class="grid">
         <div class="box">
-          <h3>Keystone</h3>
-          <p>Authentication, application credential token এবং service catalog resolve করার জন্য।</p>
+          <h3>host access</h3>
+          <p>Authentication, host setting validation এবং Multipass command access manage করার জন্য।</p>
         </div>
         <div class="box">
-          <h3>Nova</h3>
+          <h3>Multipass VM</h3>
           <p>Virtual machine instance, flavor, key pair, start/stop/delete action manage করার জন্য।</p>
         </div>
         <div class="box">
-          <h3>Glance + Neutron</h3>
-          <p>Image list, network, subnet, floating IP, security group manage করার জন্য।</p>
+          <h3>Multipass image + Multipass network</h3>
+          <p>Image list, network, subnet, network address, security group manage করার জন্য।</p>
         </div>
         <div class="box">
-          <h3>Cinder + Telemetry</h3>
+          <h3>Multipass storage + Telemetry</h3>
           <p>Volume, attachment, storage এবং utilization metrics দেখানোর জন্য।</p>
         </div>
       </div>
-      <div class="footer"><span>OpenStack Services</span><span>Slide 5</span></div>
+      <div class="footer"><span>Multipass Services</span><span>Slide 5</span></div>
     </section>
 
     <section class="slide light">
@@ -369,7 +369,7 @@
         <li>Role-based access control: ADMIN, USER, VIEWER.</li>
         <li>Application settings, user preferences, notifications এবং activity logs.</li>
         <li>Dashboard shell, sidebar navigation, responsive UI states.</li>
-        <li>API route structure এবং future OpenStack integration-এর জন্য server-only modules.</li>
+        <li>API route structure এবং future Multipass integration-এর জন্য server-only modules.</li>
       </ul>
       <div class="footer"><span>Implemented Features</span><span>Slide 6</span></div>
     </section>
@@ -384,7 +384,7 @@
         </div>
         <div class="box">
           <h3>Credential</h3>
-          <p>OpenStack credential server-side থাকে এবং AES-256-GCM দিয়ে encrypt করার helper আছে।</p>
+          <p>Multipass host access setting server-side থাকে এবং AES-256-GCM দিয়ে encrypt করার helper আছে।</p>
         </div>
         <div class="box">
           <h3>RBAC</h3>
@@ -418,7 +418,7 @@
         <div class="box">
           <div class="large-number">02</div>
           <h3>Cloud Config</h3>
-          <p>CloudConnection, encrypted credential, region, endpoint interface.</p>
+          <p>MultipassConnection, encrypted host setting, host, driver, socket path.</p>
         </div>
         <div class="box">
           <div class="large-number">03</div>
@@ -427,7 +427,7 @@
         </div>
       </div>
       <p class="note">
-        OpenStack resource state duplicate করে database-এ full copy রাখা হয় না; OpenStack source of truth হিসেবে ধরা হয়েছে।
+        Multipass resource state duplicate করে database-এ full copy রাখা হয় না; Multipass VM state source of truth হিসেবে ধরা হয়েছে।
       </p>
       <div class="footer"><span>Database Design</span><span>Slide 8</span></div>
     </section>
@@ -454,7 +454,7 @@ npm run dev</div>
       <h2>বর্তমান limitation এবং honest status</h2>
       <ul>
         <li>Authentication, user-role, settings, logs এবং UI foundation ready.</li>
-        <li>OpenStack live API integration এখন phase-wise placeholder হিসেবে রাখা হয়েছে।</li>
+        <li>Multipass live CLI integration এখন phase-wise placeholder হিসেবে রাখা হয়েছে।</li>
         <li>Instance, key pair, image, network, volume, metrics API এখন authenticated 501 response দিতে পারে।</li>
         <li>Fake cloud data দেখানো হয়নি, যাতে demo misleading না হয়।</li>
       </ul>
@@ -469,11 +469,11 @@ npm run dev</div>
       <h2>প্রেজেন্টেশনে যে প্রশ্নগুলো আসতে পারে</h2>
       <ul>
         <li>এই project-এর main objective কী?</li>
-        <li>AWS আর OpenStack-এর মধ্যে পার্থক্য কী?</li>
-        <li>Browser থেকে সরাসরি OpenStack call না করার কারণ কী?</li>
+        <li>AWS আর Ubuntu Multipass-এর মধ্যে পার্থক্য কী?</li>
+        <li>Browser থেকে সরাসরি Multipass call না করার কারণ কী?</li>
         <li>Auth.js, Prisma, PostgreSQL কেন ব্যবহার করা হয়েছে?</li>
         <li>Role-based permission কীভাবে enforce হয়?</li>
-        <li>Password এবং cloud credential কীভাবে secure রাখা হয়েছে?</li>
+        <li>Password এবং host access secret কীভাবে secure রাখা হয়েছে?</li>
         <li>Current limitation কী এবং next phase-এ কী implement করবেন?</li>
       </ul>
       <div class="footer"><span>Possible Questions</span><span>Slide 11</span></div>
@@ -485,12 +485,12 @@ npm run dev</div>
       <p class="subtitle">
         OpenCloud Compute Console একটি secure, scalable foundation যেখানে user authentication, role management,
         database-backed settings, activity log এবং cloud dashboard UI তৈরি করা হয়েছে। Future phase-এ এই foundation-এর
-        উপর Keystone, Nova, Glance, Neutron, Cinder এবং Telemetry integration complete করা যাবে।
+        উপর host access, Multipass VM, Multipass image, Multipass network, Multipass storage এবং Telemetry integration complete করা যাবে।
       </p>
       <div class="pill-row">
         <span class="pill">Secure</span>
         <span class="pill">Role-based</span>
-        <span class="pill">OpenStack-ready</span>
+        <span class="pill">Multipass-ready</span>
         <span class="pill">Dockerized</span>
       </div>
       <div class="footer"><span>Thank You</span><span>Slide 12</span></div>

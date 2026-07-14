@@ -6,32 +6,32 @@ export const demoDashboardMetrics = [
   { title: "Allocated vCPUs", value: "48", helper: "Across active demo flavors" },
   { title: "Allocated RAM", value: "192 GB", helper: "Current reserved memory" },
   { title: "Volume Storage", value: "1.8 TB", helper: "Attached and available volumes" },
-  { title: "Floating IPs", value: "7", helper: "5 associated, 2 reserved" }
+  { title: "Network Addresses", value: "7", helper: "5 assigned, 2 reserved" }
 ];
 
 export const demoQuotaUsage = [
   { label: "Instances", used: 12, limit: 24 },
   { label: "vCPUs", used: 48, limit: 96 },
   { label: "RAM", used: 192, limit: 384 },
-  { label: "Floating IPs", used: 7, limit: 16 },
+  { label: "Network addresses", used: 7, limit: 16 },
   { label: "Volumes", used: 18, limit: 40 },
   { label: "Volume storage", used: 1840, limit: 4096 }
 ];
 
 export const demoRecentInstances = [
-  { name: "web-prod-01", status: "ACTIVE", flavor: "m1.medium", privateIp: "10.10.1.21", az: "nova-a" },
-  { name: "api-prod-02", status: "ACTIVE", flavor: "c2.large", privateIp: "10.10.1.34", az: "nova-a" },
-  { name: "worker-batch-01", status: "SHUTOFF", flavor: "m1.small", privateIp: "10.10.2.18", az: "nova-b" },
-  { name: "db-replica-01", status: "BUILD", flavor: "r2.large", privateIp: "10.10.3.12", az: "nova-c" }
+  { name: "web-prod-01", status: "ACTIVE", flavor: "2c-4g", privateIp: "10.10.1.21", az: "ubuntu-host-a" },
+  { name: "api-prod-02", status: "ACTIVE", flavor: "4c-8g", privateIp: "10.10.1.34", az: "ubuntu-host-a" },
+  { name: "worker-batch-01", status: "SHUTOFF", flavor: "1c-2g", privateIp: "10.10.2.18", az: "ubuntu-host-b" },
+  { name: "db-replica-01", status: "BUILD", flavor: "4c-16g", privateIp: "10.10.3.12", az: "ubuntu-host-c" }
 ];
 
 export const demoServiceHealth = [
-  { service: "Keystone", status: "SUCCESS", endpoint: "Identity v3", latency: "42 ms" },
-  { service: "Nova", status: "SUCCESS", endpoint: "Compute v2.1", latency: "86 ms" },
-  { service: "Glance", status: "SUCCESS", endpoint: "Image v2", latency: "59 ms" },
-  { service: "Neutron", status: "SUCCESS", endpoint: "Network v2", latency: "91 ms" },
-  { service: "Cinder", status: "SUCCESS", endpoint: "Block Storage v3", latency: "73 ms" },
-  { service: "Telemetry", status: "PAUSED", endpoint: "Gnocchi optional", latency: "Not enabled" }
+  { service: "Multipass daemon", status: "SUCCESS", endpoint: "Local host", latency: "42 ms" },
+  { service: "Instance control", status: "SUCCESS", endpoint: "launch / start / stop", latency: "86 ms" },
+  { service: "Image catalog", status: "SUCCESS", endpoint: "find", latency: "59 ms" },
+  { service: "Networking", status: "SUCCESS", endpoint: "networks", latency: "91 ms" },
+  { service: "Storage mounts", status: "SUCCESS", endpoint: "mount / umount", latency: "73 ms" },
+  { service: "Metrics", status: "PAUSED", endpoint: "Host sampling optional", latency: "Not enabled" }
 ];
 
 export const demoImages = [
@@ -50,7 +50,7 @@ export const demoKeyPairs = [
 export const demoNetworks = [
   ["private-app-net", "10.10.1.0/24", "UP", "8 ports", "router-main"],
   ["database-net", "10.10.3.0/24", "UP", "5 ports", "router-main"],
-  ["public-provider-net", "203.0.113.0/24", "UP", "7 floating IPs", "external"]
+  ["public-provider-net", "203.0.113.0/24", "UP", "7 addresses", "external"]
 ];
 
 export const demoSecurityGroups = [
@@ -76,7 +76,7 @@ export const demoFloatingIps = [
 export const demoBilling = [
   ["Compute", "$128.40", "12 instances", "Current month estimate"],
   ["Block Storage", "$184.00", "1.8 TB", "SSD and standard volumes"],
-  ["Floating IP", "$20.16", "7 IPs", "Hourly reservation estimate"],
+  ["Network Address", "$20.16", "7 addresses", "Hourly reservation estimate"],
   ["Total Estimate", "$332.56", "July 2026", "Local estimate only"]
 ];
 

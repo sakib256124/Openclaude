@@ -16,7 +16,7 @@ const jetBrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "OpenCloud Compute Console",
-  description: "An educational OpenStack virtual machine management dashboard."
+  description: "An educational Ubuntu Multipass virtual machine management dashboard."
 };
 
 export default function RootLayout({

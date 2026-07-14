@@ -33,11 +33,11 @@ export function Topbar({ user, notificationCount, onOpenMobileNav }: TopbarProps
         <div className="hidden items-center gap-2 lg:flex">
           <Button variant="secondary" size="sm" disabled>
             <Cloud />
-            RegionOne
+            localhost
           </Button>
           <Button variant="secondary" size="sm" disabled>
             <Folder />
-            Project
+            Ubuntu Lab
           </Button>
           <ConnectionBadge status="not-configured" />
         </div>
