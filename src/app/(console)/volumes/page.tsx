@@ -1,7 +1,5 @@
 import { PageHeader } from "@/components/layout/page-header";
-import { ResourceTable } from "@/components/ui/resource-table";
-import { StatusBadge } from "@/components/ui/status-badge";
-import { demoVolumes } from "@/lib/demo-data";
+import { LocalResourceManager } from "@/components/resources/local-resource-manager";
 
 const columns = [
   { key: "name", label: "Volume name", sortable: true },
@@ -14,18 +12,20 @@ const columns = [
 export default function VolumesPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Volumes" description="Demo Multipass disk and mount listing with attach/detach action state." />
-      <ResourceTable
+      <PageHeader title="Volumes" description="Create and manage volumes." />
+      <LocalResourceManager
+        storageKey="opencloud:volumes"
+        title="Create volume"
         columns={columns}
-        rows={demoVolumes.map(([name, size, status, attached, type]) => [
-          name,
-          size,
-          <StatusBadge key={status} status={status} />,
-          attached,
-          type
-        ])}
+        fields={[
+          { key: "name", label: "Volume name", defaultValue: "data-volume" },
+          { key: "size", label: "Size", defaultValue: "100 GB" },
+          { key: "status", label: "Status", defaultValue: "available" },
+          { key: "attached", label: "Attached to", defaultValue: "-" },
+          { key: "type", label: "Type", defaultValue: "standard" }
+        ]}
         emptyTitle="No volumes"
-        emptyDescription="No demo volumes available."
+        emptyDescription="Create a volume to show it here."
       />
     </div>
   );

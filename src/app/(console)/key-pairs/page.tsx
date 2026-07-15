@@ -1,6 +1,5 @@
 import { PageHeader } from "@/components/layout/page-header";
-import { ResourceTable } from "@/components/ui/resource-table";
-import { demoKeyPairs } from "@/lib/demo-data";
+import { LocalResourceManager } from "@/components/resources/local-resource-manager";
 
 const columns = [
   { key: "name", label: "Key name", sortable: true },
@@ -12,8 +11,20 @@ const columns = [
 export default function KeyPairsPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Key Pairs" description="Demo key pair listing, import, creation, and one-time private-key delivery flow." />
-      <ResourceTable columns={columns} rows={demoKeyPairs} emptyTitle="No key pairs" emptyDescription="No demo key pairs available." />
+      <PageHeader title="Key Pairs" description="Create, import, and manage key pairs." />
+      <LocalResourceManager
+        storageKey="opencloud:key-pairs"
+        title="Create key pair"
+        columns={columns}
+        fields={[
+          { key: "name", label: "Key name", defaultValue: "opencloud-key" },
+          { key: "type", label: "Type", defaultValue: "ssh-ed25519" },
+          { key: "fingerprint", label: "Fingerprint", defaultValue: "SHA256:local" },
+          { key: "created", label: "Created", defaultValue: new Date().toISOString().slice(0, 10) }
+        ]}
+        emptyTitle="No key pairs"
+        emptyDescription="Create a key pair to show it here."
+      />
     </div>
   );
 }

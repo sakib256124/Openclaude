@@ -6,7 +6,7 @@ export const multipassImageCatalog = [
 ];
 
 export const multipassFlavorCatalog = [
-  { name: "micro", cpus: 1, memory: "1G", disk: "5G", description: "Small demo VM" },
+  { name: "micro", cpus: 1, memory: "1G", disk: "5G", description: "Small VM" },
   { name: "small", cpus: 1, memory: "2G", disk: "10G", description: "Default classroom VM" },
   { name: "medium", cpus: 2, memory: "4G", disk: "20G", description: "Application test VM" },
   { name: "large", cpus: 4, memory: "8G", disk: "40G", description: "Heavier lab workload" }

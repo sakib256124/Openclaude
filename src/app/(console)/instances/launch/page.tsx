@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/layout/page-header";
 export default function LaunchInstancePage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Launch instance" description="Demo launch workflow with selected image, flavor, network, key pair, security group, storage, and quota impact." />
+      <PageHeader title="Launch instance" description="Create a new instance with selected image, flavor, network, key pair, security group, storage, and quota impact." />
       <LaunchInstanceForm />
     </div>
   );

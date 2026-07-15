@@ -8,7 +8,7 @@ export default function MultipassSettingsPage() {
     <div className="space-y-6">
       <PageHeader
         title="Multipass Host"
-        description="Demo Ubuntu host, Multipass driver, socket, and connection test overview."
+        description="Ubuntu host, Multipass driver, socket, and connection test overview."
         actions={<ConnectionBadge status="healthy" />}
       />
       <section className="grid gap-4 xl:grid-cols-3">

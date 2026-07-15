@@ -19,7 +19,7 @@ export function InstanceStatusChart() {
         <div className="flex items-end justify-between">
           <div>
             <div className="text-4xl font-semibold">{total}</div>
-            <div className="text-sm text-muted-foreground">Total demo instances</div>
+            <div className="text-sm text-muted-foreground">Total instances</div>
           </div>
           <div className="text-right text-sm text-muted-foreground">localhost</div>
         </div>

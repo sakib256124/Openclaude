@@ -1,7 +1,5 @@
 import { PageHeader } from "@/components/layout/page-header";
-import { ResourceTable } from "@/components/ui/resource-table";
-import { StatusBadge } from "@/components/ui/status-badge";
-import { demoImages } from "@/lib/demo-data";
+import { LocalResourceManager } from "@/components/resources/local-resource-manager";
 
 const columns = [
   { key: "name", label: "Image name", sortable: true },
@@ -14,12 +12,20 @@ const columns = [
 export default function ImagesPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Images" description="Demo Multipass image inventory with filters, metadata, and selection safety." />
-      <ResourceTable
+      <PageHeader title="Images" description="Create and manage image records." />
+      <LocalResourceManager
+        storageKey="opencloud:images"
+        title="Create image"
         columns={columns}
-        rows={demoImages.map(([name, os, status, size, updated]) => [name, os, <StatusBadge key={status} status={status} />, size, updated])}
+        fields={[
+          { key: "name", label: "Image name", defaultValue: "ubuntu-24.04-server" },
+          { key: "os", label: "OS", defaultValue: "Ubuntu 24.04 LTS" },
+          { key: "status", label: "Status", defaultValue: "ACTIVE" },
+          { key: "size", label: "Size", defaultValue: "22.4 GB" },
+          { key: "updated", label: "Updated", defaultValue: new Date().toISOString().slice(0, 10) }
+        ]}
         emptyTitle="No images"
-        emptyDescription="No demo images available."
+        emptyDescription="Create an image to show it here."
       />
     </div>
   );

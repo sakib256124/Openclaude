@@ -1,7 +1,5 @@
 import { PageHeader } from "@/components/layout/page-header";
-import { ResourceTable } from "@/components/ui/resource-table";
-import { StatusBadge } from "@/components/ui/status-badge";
-import { demoNetworks } from "@/lib/demo-data";
+import { LocalResourceManager } from "@/components/resources/local-resource-manager";
 
 const columns = [
   { key: "name", label: "Network name", sortable: true },
@@ -14,12 +12,20 @@ const columns = [
 export default function NetworksPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Networks" description="Demo Multipass network, subnet, interface, and connected-resource view." />
-      <ResourceTable
+      <PageHeader title="Networks" description="Create and manage network records." />
+      <LocalResourceManager
+        storageKey="opencloud:networks"
+        title="Create network"
         columns={columns}
-        rows={demoNetworks.map(([name, cidr, status, ports, router]) => [name, cidr, <StatusBadge key={status} status={status} />, ports, router])}
+        fields={[
+          { key: "name", label: "Network name", defaultValue: "private-app-net" },
+          { key: "cidr", label: "CIDR", defaultValue: "10.10.1.0/24" },
+          { key: "status", label: "Status", defaultValue: "UP" },
+          { key: "ports", label: "Ports", defaultValue: "0 ports" },
+          { key: "router", label: "Router", defaultValue: "router-main" }
+        ]}
         emptyTitle="No networks"
-        emptyDescription="No demo networks available."
+        emptyDescription="Create a network to show it here."
       />
     </div>
   );

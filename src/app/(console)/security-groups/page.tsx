@@ -1,6 +1,5 @@
 import { PageHeader } from "@/components/layout/page-header";
-import { ResourceTable } from "@/components/ui/resource-table";
-import { demoSecurityGroups } from "@/lib/demo-data";
+import { LocalResourceManager } from "@/components/resources/local-resource-manager";
 
 const columns = [
   { key: "name", label: "Group name", sortable: true },
@@ -12,12 +11,19 @@ const columns = [
 export default function SecurityGroupsPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Security groups" description="Demo firewall rules, presets, and sensitive-port warnings." />
-      <ResourceTable
+      <PageHeader title="Security groups" description="Create and manage firewall groups." />
+      <LocalResourceManager
+        storageKey="opencloud:security-groups"
+        title="Create security group"
         columns={columns}
-        rows={demoSecurityGroups}
         emptyTitle="No security groups"
-        emptyDescription="No demo security groups available."
+        emptyDescription="Create a security group to show it here."
+        fields={[
+          { key: "name", label: "Group name", defaultValue: "web-sg" },
+          { key: "rules", label: "Allowed traffic", defaultValue: "HTTP, HTTPS, SSH" },
+          { key: "ruleCount", label: "Rules", defaultValue: "0 rules" },
+          { key: "attached", label: "Attached to", defaultValue: "0 instances" }
+        ]}
       />
     </div>
   );

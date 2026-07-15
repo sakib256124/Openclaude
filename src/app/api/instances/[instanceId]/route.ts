@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { requireApiPermission } from "@/app/api/_utils/auth";
 import { multipassErrorResponse } from "@/app/api/_utils/multipass";
+import { OpenCloudError } from "@/lib/multipass/errors";
+import { deleteLocalInstance } from "@/lib/multipass/local-store";
 import { deleteMultipassInstance, getMultipassInstance } from "@/lib/multipass/multipass-cli";
 import { normalizeMultipassName } from "@/lib/multipass/normalizers";
 
@@ -53,6 +55,10 @@ export async function DELETE(_request: Request, { params }: Params) {
     await deleteMultipassInstance(name);
     return NextResponse.json({ ok: true });
   } catch (error) {
+    if (error instanceof OpenCloudError && error.code === "SERVICE_UNAVAILABLE") {
+      return NextResponse.json({ ok: deleteLocalInstance(name), source: "local" });
+    }
+
     return multipassErrorResponse(error);
   }
 }

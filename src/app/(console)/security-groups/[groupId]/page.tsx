@@ -25,7 +25,7 @@ export default async function SecurityGroupDetailsPage({
   return (
     <div className="space-y-6">
       <PageHeader title="Security group details" description={`Security group ${groupId}`} />
-      <ResourceTable columns={columns} rows={rows} emptyTitle="No rules" emptyDescription="No demo security group rules available." />
+      <ResourceTable columns={columns} rows={rows} emptyTitle="No rules" emptyDescription="Create security group rules to show them here." />
     </div>
   );
 }

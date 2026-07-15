@@ -38,7 +38,7 @@ type AppJwtFields = {
   isActive?: boolean;
 };
 
-function getLocalDemoUser(email: string, password: string) {
+function getLocalUser(email: string, password: string) {
   const allowAnyLocalLogin =
     process.env.LOCAL_DEMO_LOGIN_ANY === "true" ||
     (process.env.NODE_ENV !== "production" && process.env.LOCAL_DEMO_LOGIN_ANY !== "false");
@@ -48,9 +48,9 @@ function getLocalDemoUser(email: string, password: string) {
   }
 
   return {
-    id: `local-demo-${email}`,
+    id: `local-user-${email}`,
     email,
-    name: email.split("@")[0] || "Local Demo User",
+    name: email.split("@")[0] || "Local User",
     role: "ADMIN" as Role,
     isActive: true
   };
@@ -97,7 +97,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
-        const localDemoUser = getLocalDemoUser(parsed.data.email, parsed.data.password);
+        const localUser = getLocalUser(parsed.data.email, parsed.data.password);
 
         let user: Awaited<ReturnType<typeof prisma.user.findUnique>> = null;
 
@@ -106,17 +106,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             where: { email: parsed.data.email }
           });
         } catch {
-          return localDemoUser;
+          return localUser;
         }
 
         if (!user?.passwordHash || !user.isActive) {
-          return localDemoUser;
+          return localUser;
         }
 
         const validPassword = await verifyPassword(parsed.data.password, user.passwordHash);
 
         if (!validPassword) {
-          return localDemoUser;
+          return localUser;
         }
 
         try {
@@ -195,7 +195,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }
         });
       } catch {
-        // Ignore audit write failures during local demos without a database.
+        // Ignore audit write failures during local runs without a database.
       }
     }
   }

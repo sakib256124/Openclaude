@@ -1,39 +1,33 @@
 import "server-only";
-import { demoRecentInstances } from "@/lib/demo-data";
 import type { MultipassInstance, MultipassLaunchInput } from "@/lib/multipass/types";
 
-type DemoStore = {
+type LocalStore = {
   instances: MultipassInstance[];
 };
 
-const globalDemoStore = globalThis as typeof globalThis & {
-  __opencloudMultipassDemoStore?: DemoStore;
+const globalLocalStore = globalThis as typeof globalThis & {
+  __opencloudMultipassLocalStore?: LocalStore;
 };
 
 function initialInstances(): MultipassInstance[] {
-  return demoRecentInstances.map((instance) => ({
-    name: instance.name,
-    state: instance.status === "ACTIVE" ? "Running" : instance.status === "SHUTOFF" ? "Stopped" : "Starting",
-    ipv4: [instance.privateIp],
-    release: "Ubuntu 24.04 LTS"
-  }));
+  return [];
 }
 
 function getStore() {
-  if (!globalDemoStore.__opencloudMultipassDemoStore) {
-    globalDemoStore.__opencloudMultipassDemoStore = {
+  if (!globalLocalStore.__opencloudMultipassLocalStore) {
+    globalLocalStore.__opencloudMultipassLocalStore = {
       instances: initialInstances()
     };
   }
 
-  return globalDemoStore.__opencloudMultipassDemoStore;
+  return globalLocalStore.__opencloudMultipassLocalStore;
 }
 
-export function listDemoInstances() {
+export function listLocalInstances() {
   return getStore().instances;
 }
 
-export function createDemoInstance(input: MultipassLaunchInput) {
+export function createLocalInstance(input: MultipassLaunchInput) {
   const store = getStore();
   const existingIndex = store.instances.findIndex((instance) => instance.name === input.name);
   const instance: MultipassInstance = {
@@ -53,4 +47,11 @@ export function createDemoInstance(input: MultipassLaunchInput) {
   }
 
   return instance;
+}
+
+export function deleteLocalInstance(name: string) {
+  const store = getStore();
+  const before = store.instances.length;
+  store.instances = store.instances.filter((instance) => instance.name !== name);
+  return store.instances.length !== before;
 }

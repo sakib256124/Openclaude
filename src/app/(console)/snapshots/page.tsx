@@ -1,7 +1,5 @@
 import { PageHeader } from "@/components/layout/page-header";
-import { ResourceTable } from "@/components/ui/resource-table";
-import { StatusBadge } from "@/components/ui/status-badge";
-import { demoInstanceSnapshots } from "@/lib/demo-data";
+import { LocalResourceManager } from "@/components/resources/local-resource-manager";
 
 const columns = [
   { key: "name", label: "Snapshot name", sortable: true },
@@ -14,18 +12,20 @@ const columns = [
 export default function SnapshotsPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Snapshots" description="Demo Multipass instance snapshots separated from storage snapshots." />
-      <ResourceTable
+      <PageHeader title="Snapshots" description="Create and manage instance snapshots." />
+      <LocalResourceManager
+        storageKey="opencloud:snapshots"
+        title="Create snapshot"
         columns={columns}
-        rows={demoInstanceSnapshots.map(([name, source, status, size, created]) => [
-          name,
-          source,
-          <StatusBadge key={status} status={status} />,
-          size,
-          created
-        ])}
+        fields={[
+          { key: "name", label: "Snapshot name", defaultValue: "instance-snapshot" },
+          { key: "source", label: "Source instance", defaultValue: "web-app-01" },
+          { key: "status", label: "Status", defaultValue: "ACTIVE" },
+          { key: "size", label: "Size", defaultValue: "22.6 GB" },
+          { key: "created", label: "Created", defaultValue: new Date().toISOString().slice(0, 10) }
+        ]}
         emptyTitle="No snapshots"
-        emptyDescription="No demo snapshots available."
+        emptyDescription="Create a snapshot to show it here."
       />
     </div>
   );

@@ -27,8 +27,8 @@ const reviewRows = [
 
 export function LaunchInstanceForm() {
   const router = useRouter();
-  const [instanceName, setInstanceName] = React.useState("web-demo-03");
-  const [description, setDescription] = React.useState("Frontend demo node");
+  const [instanceName, setInstanceName] = React.useState("web-app-01");
+  const [description, setDescription] = React.useState("Frontend node");
   const [availabilityZone, setAvailabilityZone] = React.useState("nova-a");
   const [instanceCount, setInstanceCount] = React.useState(1);
   const [pending, setPending] = React.useState(false);

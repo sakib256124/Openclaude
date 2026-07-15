@@ -3,7 +3,7 @@ import { z } from "zod";
 import { requireApiPermission } from "@/app/api/_utils/auth";
 import { multipassErrorResponse } from "@/app/api/_utils/multipass";
 import { OpenCloudError } from "@/lib/multipass/errors";
-import { createDemoInstance, listDemoInstances } from "@/lib/multipass/demo-store";
+import { createLocalInstance, listLocalInstances } from "@/lib/multipass/local-store";
 import { launchMultipassInstance, listMultipassInstances } from "@/lib/multipass/multipass-cli";
 
 const launchSchema = z.object({
@@ -27,7 +27,7 @@ export async function GET() {
     return NextResponse.json({ source: "multipass", instances });
   } catch (error) {
     if (error instanceof OpenCloudError && error.code === "SERVICE_UNAVAILABLE") {
-      return NextResponse.json({ source: "demo", instances: listDemoInstances() });
+      return NextResponse.json({ source: "local", instances: listLocalInstances() });
     }
 
     return multipassErrorResponse(error);
@@ -62,8 +62,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ instance }, { status: 201 });
   } catch (error) {
     if (error instanceof OpenCloudError && error.code === "SERVICE_UNAVAILABLE") {
-      const instance = createDemoInstance(parsed.data);
-      return NextResponse.json({ source: "demo", instance }, { status: 201 });
+      const instance = createLocalInstance(parsed.data);
+      return NextResponse.json({ source: "local", instance }, { status: 201 });
     }
 
     return multipassErrorResponse(error);

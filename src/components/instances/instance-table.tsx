@@ -1,13 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { Columns3, Plus, Search } from "lucide-react";
+import { Columns3, Plus, Search, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { FilterBar } from "@/components/ui/filter-bar";
 import { ResourceTable } from "@/components/ui/resource-table";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { demoRecentInstances } from "@/lib/demo-data";
 
 type InstanceRow = {
   name: string;
@@ -49,17 +48,10 @@ function statusFromState(state: string) {
   return state.toUpperCase();
 }
 
-function demoRows(): InstanceRow[] {
-  return demoRecentInstances.map((instance) => ({
-    ...instance,
-    image: instance.name.includes("db") ? "ubuntu-24.04-server" : "debian-12-cloud",
-    created: "2026-07-12"
-  }));
-}
-
 export function InstanceTable() {
-  const [instances, setInstances] = React.useState<InstanceRow[]>(demoRows());
+  const [instances, setInstances] = React.useState<InstanceRow[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [actionPending, setActionPending] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     let mounted = true;
@@ -86,11 +78,11 @@ export function InstanceTable() {
               status: statusFromState(instance.state ?? "Unknown"),
               flavor: instance.memoryUsage ? `2c-${instance.memoryUsage}` : "m1.medium",
               privateIp: instance.ipv4?.[0] ?? "-",
-              az: data.source === "demo" ? "demo-local" : "multipass",
+              az: data.source === "local" ? "local" : "multipass",
               image: instance.release ?? instance.imageHash ?? "ubuntu-24.04-server",
               created: "Just now"
             }))
-          : demoRows();
+          : [];
 
         if (mounted) {
           setInstances(rows);
@@ -109,6 +101,22 @@ export function InstanceTable() {
     };
   }, []);
 
+  async function terminateInstance(name: string) {
+    setActionPending(name);
+
+    try {
+      const response = await fetch(`/api/instances/${encodeURIComponent(name)}`, {
+        method: "DELETE"
+      });
+
+      if (response.ok) {
+        setInstances((current) => current.filter((instance) => instance.name !== name));
+      }
+    } finally {
+      setActionPending(null);
+    }
+  }
+
   const rows = instances.map((instance) => [
     <input key={`${instance.name}-select`} type="checkbox" className="h-4 w-4 rounded border" aria-label={`Select ${instance.name}`} />,
     <span key={`${instance.name}-name`} className="font-medium">{instance.name}</span>,
@@ -120,7 +128,16 @@ export function InstanceTable() {
     instance.privateIp === "-" ? "-" : instance.privateIp,
     instance.az,
     instance.created ?? "2026-07-12",
-    <Button key={`${instance.name}-action`} variant="secondary">Actions</Button>
+    <Button
+      key={`${instance.name}-action`}
+      disabled={actionPending === instance.name}
+      variant="destructive"
+      size="sm"
+      onClick={() => terminateInstance(instance.name)}
+    >
+      <Trash2 />
+      {actionPending === instance.name ? "Terminating" : "Terminate"}
+    </Button>
   ]);
 
   return (
@@ -130,7 +147,7 @@ export function InstanceTable() {
           <>
             <div className="flex h-[42px] min-w-72 items-center gap-2 rounded-md border bg-background px-3 text-sm text-muted-foreground">
               <Search className="h-4 w-4" />
-              Search demo instances
+              Search instances
             </div>
             {["Status", "Image", "Flavor", "Availability Zone", "Network"].map((filter) => (
               <button key={filter} className="h-[42px] rounded-md border bg-background px-3 text-sm text-muted-foreground" disabled>
@@ -159,7 +176,7 @@ export function InstanceTable() {
         rows={rows}
         loading={loading}
         emptyTitle="No instances loaded"
-        emptyDescription="No demo instances available."
+        emptyDescription="Launch an instance to show it here."
       />
     </div>
   );
