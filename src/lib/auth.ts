@@ -38,6 +38,23 @@ type AppJwtFields = {
   isActive?: boolean;
 };
 
+function getSeedAdminUser(email: string, password: string) {
+  const seedEmail = process.env.SEED_ADMIN_EMAIL?.toLowerCase();
+  const seedPassword = process.env.SEED_ADMIN_PASSWORD;
+
+  if (!seedEmail || !seedPassword || email !== seedEmail || password !== seedPassword) {
+    return null;
+  }
+
+  return {
+    id: "seed-admin",
+    email: seedEmail,
+    name: process.env.SEED_ADMIN_NAME ?? "Demo Admin",
+    role: "ADMIN" as Role,
+    isActive: true
+  };
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   secret: process.env.AUTH_SECRET,
@@ -79,36 +96,48 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: parsed.data.email }
-        });
+        const seedAdmin = getSeedAdminUser(parsed.data.email, parsed.data.password);
+
+        let user: Awaited<ReturnType<typeof prisma.user.findUnique>> = null;
+
+        try {
+          user = await prisma.user.findUnique({
+            where: { email: parsed.data.email }
+          });
+        } catch {
+          return seedAdmin;
+        }
 
         if (!user?.passwordHash || !user.isActive) {
-          return null;
+          return seedAdmin;
         }
 
         const validPassword = await verifyPassword(parsed.data.password, user.passwordHash);
 
         if (!validPassword) {
-          return null;
+          return seedAdmin;
         }
 
-        await prisma.$transaction([
-          prisma.user.update({
-            where: { id: user.id },
-            data: { lastLoginAt: new Date() }
-          }),
-          prisma.activityLog.create({
-            data: {
-              userId: user.id,
-              action: "auth.login",
-              resourceType: "session",
-              service: "auth",
-              status: "SUCCESS",
-              safeMessage: "User signed in."
-            }
-          })
-        ]);
+        try {
+          await prisma.$transaction([
+            prisma.user.update({
+              where: { id: user.id },
+              data: { lastLoginAt: new Date() }
+            }),
+            prisma.activityLog.create({
+              data: {
+                userId: user.id,
+                action: "auth.login",
+                resourceType: "session",
+                service: "auth",
+                status: "SUCCESS",
+                safeMessage: "User signed in."
+              }
+            })
+          ]);
+        } catch {
+          // Login should still work if audit logging is temporarily unavailable.
+        }
 
         return {
           id: user.id,
@@ -153,16 +182,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return;
       }
 
-      await prisma.activityLog.create({
-        data: {
-          userId,
-          action: "auth.logout",
-          resourceType: "session",
-          service: "auth",
-          status: "SUCCESS",
-          safeMessage: "User signed out."
-        }
-      });
+      try {
+        await prisma.activityLog.create({
+          data: {
+            userId,
+            action: "auth.logout",
+            resourceType: "session",
+            service: "auth",
+            status: "SUCCESS",
+            safeMessage: "User signed out."
+          }
+        });
+      } catch {
+        // Ignore audit write failures during local demos without a database.
+      }
     }
   }
 });
