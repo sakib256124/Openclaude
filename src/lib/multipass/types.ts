@@ -7,7 +7,7 @@ export type MultipassHostConfig = {
   requestTimeoutMs: number;
 };
 
-export type MultipassInstanceState = "Running" | "Stopped" | "Suspended" | "Deleted" | "Unknown";
+export type MultipassInstanceState = "Running" | "Stopped" | "Suspended" | "Starting" | "Deleted" | "Unknown";
 
 export type MultipassInstance = {
   name: string;

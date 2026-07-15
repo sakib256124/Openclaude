@@ -1,4 +1,8 @@
-import { CheckCircle2, Circle } from "lucide-react";
+"use client";
+
+import * as React from "react";
+import { useRouter } from "next/navigation";
+import { CheckCircle2, Circle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { QuotaProgress } from "@/components/ui/quota-progress";
@@ -12,13 +16,6 @@ const steps = [
   "Review and Launch"
 ];
 
-const basicFields = [
-  ["Instance name", "web-demo-03"],
-  ["Description", "Frontend demo node"],
-  ["Availability zone", "nova-a"],
-  ["Number of instances", "1"]
-];
-
 const reviewRows = [
   ["Image", "ubuntu-24.04-server"],
   ["Flavor", "m1.medium - 2 vCPU / 8 GB RAM"],
@@ -29,8 +26,67 @@ const reviewRows = [
 ];
 
 export function LaunchInstanceForm() {
+  const router = useRouter();
+  const [instanceName, setInstanceName] = React.useState("web-demo-03");
+  const [description, setDescription] = React.useState("Frontend demo node");
+  const [availabilityZone, setAvailabilityZone] = React.useState("nova-a");
+  const [instanceCount, setInstanceCount] = React.useState(1);
+  const [pending, setPending] = React.useState(false);
+  const [message, setMessage] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
+
+  async function createInstance(name: string) {
+    const response = await fetch("/api/instances", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        name,
+        image: "24.04",
+        cpus: 2,
+        memory: "8G",
+        disk: "80G",
+        description,
+        availabilityZone
+      })
+    });
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      throw new Error(data?.error?.message ?? "Instance launch failed.");
+    }
+
+    return data;
+  }
+
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setPending(true);
+    setError(null);
+    setMessage(null);
+
+    try {
+      const count = Math.max(1, Math.min(10, instanceCount));
+      const baseName = instanceName.trim();
+
+      for (let index = 0; index < count; index += 1) {
+        const nextName = count === 1 ? baseName : `${baseName}-${index + 1}`;
+        await createInstance(nextName);
+      }
+
+      setMessage(`${count} instance${count > 1 ? "s" : ""} created.`);
+      router.push("/instances");
+      router.refresh();
+    } catch (caughtError) {
+      setError(caughtError instanceof Error ? caughtError.message : "Instance launch failed.");
+    } finally {
+      setPending(false);
+    }
+  }
+
   return (
-    <section className="grid gap-4 xl:grid-cols-[300px_1fr]">
+    <form className="grid gap-4 xl:grid-cols-[300px_1fr]" onSubmit={onSubmit}>
       <Card>
         <CardHeader>
           <CardTitle>Launch steps</CardTitle>
@@ -50,16 +106,43 @@ export function LaunchInstanceForm() {
             <CardTitle>Basic Information</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-[18px] md:grid-cols-2">
-            {basicFields.map(([label, value]) => (
-              <label key={label} className="space-y-[7px] text-[13px] font-semibold leading-[18px]">
-                <span>{label}</span>
-                <input
-                  className="h-[42px] w-full rounded-md border bg-background px-3 text-sm leading-5 outline-none focus:ring-2 focus:ring-ring"
-                  value={value}
-                  readOnly
-                />
-              </label>
-            ))}
+            <label className="space-y-[7px] text-[13px] font-semibold leading-[18px]">
+              <span>Instance name</span>
+              <input
+                className="h-[42px] w-full rounded-md border bg-background px-3 text-sm leading-5 outline-none focus:ring-2 focus:ring-ring"
+                value={instanceName}
+                pattern="[a-zA-Z0-9][a-zA-Z0-9-]{0,62}"
+                required
+                onChange={(event) => setInstanceName(event.target.value)}
+              />
+            </label>
+            <label className="space-y-[7px] text-[13px] font-semibold leading-[18px]">
+              <span>Description</span>
+              <input
+                className="h-[42px] w-full rounded-md border bg-background px-3 text-sm leading-5 outline-none focus:ring-2 focus:ring-ring"
+                value={description}
+                onChange={(event) => setDescription(event.target.value)}
+              />
+            </label>
+            <label className="space-y-[7px] text-[13px] font-semibold leading-[18px]">
+              <span>Availability zone</span>
+              <input
+                className="h-[42px] w-full rounded-md border bg-background px-3 text-sm leading-5 outline-none focus:ring-2 focus:ring-ring"
+                value={availabilityZone}
+                onChange={(event) => setAvailabilityZone(event.target.value)}
+              />
+            </label>
+            <label className="space-y-[7px] text-[13px] font-semibold leading-[18px]">
+              <span>Number of instances</span>
+              <input
+                className="h-[42px] w-full rounded-md border bg-background px-3 text-sm leading-5 outline-none focus:ring-2 focus:ring-ring"
+                min={1}
+                max={10}
+                type="number"
+                value={instanceCount}
+                onChange={(event) => setInstanceCount(Number(event.target.value))}
+              />
+            </label>
           </CardContent>
         </Card>
         <Card>
@@ -85,12 +168,23 @@ export function LaunchInstanceForm() {
             <QuotaProgress label="RAM" used={200} limit={384} />
           </CardContent>
         </Card>
+        {message ? (
+          <div className="rounded-md border border-emerald-400/40 bg-emerald-400/10 px-3 py-2 text-sm text-emerald-200">
+            {message}
+          </div>
+        ) : null}
+        {error ? (
+          <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            {error}
+          </div>
+        ) : null}
         <div className="flex justify-end">
-          <Button size="lg">
-            Review and Launch
+          <Button size="lg" disabled={pending} type="submit">
+            {pending ? <Loader2 className="animate-spin" /> : null}
+            {pending ? "Launching" : "Review and Launch"}
           </Button>
         </div>
       </div>
-    </section>
+    </form>
   );
 }
