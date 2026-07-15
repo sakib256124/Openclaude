@@ -14,9 +14,11 @@ export default async function ConsoleLayout({
     redirect("/login");
   }
 
-  const notificationCount = await prisma.notification.count({
-    where: { userId: user.id, readAt: null }
-  });
+  const notificationCount = user.id.startsWith("local-demo-")
+    ? 0
+    : await prisma.notification.count({
+        where: { userId: user.id, readAt: null }
+      }).catch(() => 0);
 
   return (
     <AppShell user={user} notificationCount={notificationCount}>
