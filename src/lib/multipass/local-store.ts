@@ -1,5 +1,5 @@
 import "server-only";
-import type { MultipassInstance, MultipassLaunchInput } from "@/lib/multipass/types";
+import type { MultipassAction, MultipassInstance, MultipassLaunchInput } from "@/lib/multipass/types";
 
 type LocalStore = {
   instances: MultipassInstance[];
@@ -54,4 +54,23 @@ export function deleteLocalInstance(name: string) {
   const before = store.instances.length;
   store.instances = store.instances.filter((instance) => instance.name !== name);
   return store.instances.length !== before;
+}
+
+export function runLocalInstanceAction(name: string, action: MultipassAction) {
+  const store = getStore();
+  const instance = store.instances.find((item) => item.name === name);
+
+  if (!instance) {
+    return null;
+  }
+
+  if (action === "stop") {
+    instance.state = "Stopped";
+  } else if (action === "suspend") {
+    instance.state = "Suspended";
+  } else {
+    instance.state = "Running";
+  }
+
+  return instance;
 }

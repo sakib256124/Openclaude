@@ -9,6 +9,7 @@ datasource db {
 
 enum Role {
   ADMIN
+  DEVELOPER
   USER
   VIEWER
 }
@@ -42,25 +43,103 @@ enum PricingUnit {
   INSTANCE_HOUR
 }
 
+enum ComputeInstanceStatus {
+  PENDING
+  RUNNING
+  STOPPED
+  SUSPENDED
+  TERMINATED
+  ERROR
+}
+
+enum ImageStatus {
+  AVAILABLE
+  PENDING
+  ERROR
+  DELETED
+}
+
+enum ImageVisibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum NetworkStatus {
+  AVAILABLE
+  PENDING
+  ERROR
+  DELETED
+}
+
+enum IpAddressStatus {
+  AVAILABLE
+  ASSOCIATED
+  RELEASED
+}
+
+enum SecurityRuleDirection {
+  INGRESS
+  EGRESS
+}
+
+enum SecurityRuleProtocol {
+  TCP
+  UDP
+  ICMP
+  ALL
+}
+
+enum VolumeStatus {
+  AVAILABLE
+  IN_USE
+  DELETING
+  DELETED
+  ERROR
+}
+
+enum SnapshotStatus {
+  PENDING
+  COMPLETED
+  ERROR
+  DELETED
+}
+
+enum UsageMetricType {
+  INSTANCE_HOUR
+  VCPU_HOUR
+  RAM_GB_HOUR
+  STORAGE_GB_MONTH
+  NETWORK_GB
+}
+
 model User {
-  id              String            @id @default(cuid())
-  name            String?
-  email           String            @unique
-  emailVerified   DateTime?
-  image           String?
-  passwordHash    String?
-  role            Role              @default(USER)
-  isActive        Boolean           @default(true)
-  lastLoginAt     DateTime?
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  accounts        Account[]
-  sessions        Session[]
-  connections     MultipassConnection[]
-  activityLogs    ActivityLog[]
-  notifications   Notification[]
-  operations      ResourceOperation[]
-  preferences     UserPreference?
+  id                 String                @id @default(cuid())
+  name               String?
+  email              String                @unique
+  emailVerified      DateTime?
+  image              String?
+  passwordHash       String?
+  role               Role                  @default(USER)
+  isActive           Boolean               @default(true)
+  lastLoginAt        DateTime?
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+  accounts           Account[]
+  sessions           Session[]
+  connections        MultipassConnection[]
+  activityLogs       ActivityLog[]
+  notifications      Notification[]
+  operations         ResourceOperation[]
+  preferences        UserPreference?
+  computeInstances   ComputeInstance[]
+  machineImages      MachineImage[]
+  virtualNetworks    VirtualNetwork[]
+  securityGroups     SecurityGroup[]
+  keyPairs           KeyPair[]
+  elasticIpAddresses ElasticIpAddress[]
+  volumes            Volume[]
+  snapshots          Snapshot[]
+  usageRecords       UsageRecord[]
 
   @@index([role])
   @@index([isActive])
@@ -104,20 +183,268 @@ model VerificationToken {
 }
 
 model MultipassConnection {
-  id                     String          @id @default(cuid())
-  displayName            String
-  host                   String
-  driver                 MultipassDriver @default(qemu)
-  socketPath             String?
-  encryptedAccessSecret  String?         @db.Text
-  active                 Boolean         @default(true)
-  ownerUserId            String
-  owner                  User            @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
-  createdAt              DateTime        @default(now())
-  updatedAt              DateTime        @updatedAt
+  id                    String          @id @default(cuid())
+  displayName           String
+  host                  String
+  driver                MultipassDriver @default(qemu)
+  socketPath            String?
+  encryptedAccessSecret String?         @db.Text
+  active                Boolean         @default(true)
+  ownerUserId           String
+  owner                 User            @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
 
   @@index([ownerUserId])
   @@index([active])
+}
+
+model ComputeInstance {
+  id                 String                @id @default(cuid())
+  instanceId         String                @unique
+  multipassName      String?               @unique
+  name               String
+  status             ComputeInstanceStatus @default(PENDING)
+  powerState         String?
+  operatingSystem    String
+  imageRef           String
+  imageId            String?
+  image              MachineImage?         @relation(fields: [imageId], references: [id], onDelete: SetNull)
+  cpu                Int
+  ramMb              Int
+  storageGb          Int
+  privateIp          String?
+  publicIp           String?
+  availabilityZone   String                @default("local")
+  networkId          String?
+  network            VirtualNetwork?       @relation(fields: [networkId], references: [id], onDelete: SetNull)
+  subnetId           String?
+  subnet             Subnet?               @relation(fields: [subnetId], references: [id], onDelete: SetNull)
+  securityGroupId    String?
+  securityGroup      SecurityGroup?        @relation(fields: [securityGroupId], references: [id], onDelete: SetNull)
+  ownerUserId        String?
+  owner              User?                 @relation(fields: [ownerUserId], references: [id], onDelete: SetNull)
+  ownerEmail         String
+  launchedAt         DateTime?
+  stoppedAt          DateTime?
+  terminatedAt       DateTime?
+  lastSyncedAt       DateTime?
+  metadata           Json?
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+  attachedVolumes    Volume[]
+  elasticIpAddresses ElasticIpAddress[]
+  snapshots          Snapshot[]
+  usageRecords       UsageRecord[]
+
+  @@index([ownerUserId, createdAt])
+  @@index([status])
+  @@index([networkId])
+  @@index([securityGroupId])
+}
+
+model MachineImage {
+  id               String            @id @default(cuid())
+  imageId          String            @unique
+  name             String
+  slug             String            @unique
+  operatingSystem  String
+  version          String?
+  architecture     String            @default("x86_64")
+  visibility       ImageVisibility   @default(PRIVATE)
+  status           ImageStatus       @default(AVAILABLE)
+  sourceInstanceId String?
+  ownerUserId      String?
+  owner            User?             @relation(fields: [ownerUserId], references: [id], onDelete: SetNull)
+  ownerEmail       String?
+  description      String?
+  metadata         Json?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  instances        ComputeInstance[]
+
+  @@index([ownerUserId])
+  @@index([visibility, status])
+}
+
+model VirtualNetwork {
+  id                 String             @id @default(cuid())
+  networkId          String             @unique
+  name               String
+  cidr               String
+  status             NetworkStatus      @default(AVAILABLE)
+  ownerUserId        String?
+  owner              User?              @relation(fields: [ownerUserId], references: [id], onDelete: SetNull)
+  ownerEmail         String?
+  description        String?
+  metadata           Json?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  subnets            Subnet[]
+  instances          ComputeInstance[]
+  securityGroups     SecurityGroup[]
+  elasticIpAddresses ElasticIpAddress[]
+
+  @@index([ownerUserId])
+  @@index([status])
+}
+
+model Subnet {
+  id               String            @id @default(cuid())
+  subnetId         String            @unique
+  name             String
+  cidr             String
+  availabilityZone String            @default("local")
+  status           NetworkStatus     @default(AVAILABLE)
+  networkId        String
+  network          VirtualNetwork    @relation(fields: [networkId], references: [id], onDelete: Cascade)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  instances        ComputeInstance[]
+
+  @@index([networkId])
+  @@index([status])
+}
+
+model SecurityGroup {
+  id          String            @id @default(cuid())
+  groupId     String            @unique
+  name        String
+  description String?
+  status      NetworkStatus     @default(AVAILABLE)
+  networkId   String?
+  network     VirtualNetwork?   @relation(fields: [networkId], references: [id], onDelete: SetNull)
+  ownerUserId String?
+  owner       User?             @relation(fields: [ownerUserId], references: [id], onDelete: SetNull)
+  ownerEmail  String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  rules       FirewallRule[]
+  instances   ComputeInstance[]
+
+  @@index([ownerUserId])
+  @@index([networkId])
+}
+
+model FirewallRule {
+  id              String                @id @default(cuid())
+  ruleId          String                @unique
+  securityGroupId String
+  securityGroup   SecurityGroup         @relation(fields: [securityGroupId], references: [id], onDelete: Cascade)
+  direction       SecurityRuleDirection @default(INGRESS)
+  protocol        SecurityRuleProtocol  @default(TCP)
+  fromPort        Int?
+  toPort          Int?
+  cidr            String                @default("0.0.0.0/0")
+  description     String?
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  @@index([securityGroupId])
+  @@index([direction])
+}
+
+model KeyPair {
+  id          String   @id @default(cuid())
+  keyPairId   String   @unique
+  name        String
+  type        String   @default("ssh-ed25519")
+  fingerprint String
+  publicKey   String?  @db.Text
+  ownerUserId String?
+  owner       User?    @relation(fields: [ownerUserId], references: [id], onDelete: SetNull)
+  ownerEmail  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([ownerUserId, name])
+  @@index([ownerUserId])
+}
+
+model ElasticIpAddress {
+  id           String           @id @default(cuid())
+  allocationId String           @unique
+  publicIp     String           @unique
+  status       IpAddressStatus  @default(AVAILABLE)
+  networkId    String?
+  network      VirtualNetwork?  @relation(fields: [networkId], references: [id], onDelete: SetNull)
+  instanceId   String?
+  instance     ComputeInstance? @relation(fields: [instanceId], references: [id], onDelete: SetNull)
+  ownerUserId  String?
+  owner        User?            @relation(fields: [ownerUserId], references: [id], onDelete: SetNull)
+  ownerEmail   String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@index([ownerUserId])
+  @@index([status])
+}
+
+model Volume {
+  id                 String           @id @default(cuid())
+  volumeId           String           @unique
+  name               String
+  status             VolumeStatus     @default(AVAILABLE)
+  sizeGb             Int
+  availabilityZone   String           @default("local")
+  mountPath          String?
+  attachedInstanceId String?
+  attachedInstance   ComputeInstance? @relation(fields: [attachedInstanceId], references: [id], onDelete: SetNull)
+  ownerUserId        String?
+  owner              User?            @relation(fields: [ownerUserId], references: [id], onDelete: SetNull)
+  ownerEmail         String?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  snapshots          Snapshot[]
+  usageRecords       UsageRecord[]
+
+  @@index([ownerUserId])
+  @@index([status])
+  @@index([attachedInstanceId])
+}
+
+model Snapshot {
+  id               String           @id @default(cuid())
+  snapshotId       String           @unique
+  name             String
+  status           SnapshotStatus   @default(PENDING)
+  sizeGb           Int
+  volumeId         String?
+  volume           Volume?          @relation(fields: [volumeId], references: [id], onDelete: SetNull)
+  sourceInstanceId String?
+  sourceInstance   ComputeInstance? @relation(fields: [sourceInstanceId], references: [id], onDelete: SetNull)
+  ownerUserId      String?
+  owner            User?            @relation(fields: [ownerUserId], references: [id], onDelete: SetNull)
+  ownerEmail       String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@index([ownerUserId])
+  @@index([status])
+  @@index([volumeId])
+}
+
+model UsageRecord {
+  id         String           @id @default(cuid())
+  userId     String?
+  user       User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  instanceId String?
+  instance   ComputeInstance? @relation(fields: [instanceId], references: [id], onDelete: SetNull)
+  volumeId   String?
+  volume     Volume?          @relation(fields: [volumeId], references: [id], onDelete: SetNull)
+  metric     UsageMetricType
+  quantity   Decimal          @db.Decimal(14, 6)
+  unitPrice  Decimal?         @db.Decimal(12, 6)
+  currency   String           @default("USD")
+  startedAt  DateTime
+  endedAt    DateTime
+  metadata   Json?
+  createdAt  DateTime         @default(now())
+
+  @@index([userId, startedAt])
+  @@index([instanceId])
+  @@index([volumeId])
+  @@index([metric])
 }
 
 model ActivityLog {
@@ -160,42 +487,42 @@ model ResourceOperation {
 }
 
 model PricingRule {
-  id              String      @id @default(cuid())
-  name            String
-  service         String
-  resourceType    String
-  unit            PricingUnit
-  unitPrice       Decimal     @db.Decimal(12, 6)
-  currency        String      @default("USD")
-  region          String?
-  active          Boolean     @default(true)
-  effectiveFrom   DateTime    @default(now())
-  effectiveUntil  DateTime?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  id             String      @id @default(cuid())
+  name           String
+  service        String
+  resourceType   String
+  unit           PricingUnit
+  unitPrice      Decimal     @db.Decimal(12, 6)
+  currency       String      @default("USD")
+  region         String?
+  active         Boolean     @default(true)
+  effectiveFrom  DateTime    @default(now())
+  effectiveUntil DateTime?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
 
   @@index([service, resourceType, active])
   @@index([region])
 }
 
 model UserPreference {
-  id                       String   @id @default(cuid())
-  userId                   String   @unique
-  user                     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  theme                    String   @default("dark")
-  sidebarCollapsed         Boolean  @default(false)
-  expandedNavigation       Json?
-  tableDensity             String   @default("comfortable")
-  visibleTableColumns      Json?
-  defaultFilters           Json?
-  notificationPreferences  Json?
-  reducedMotion            Boolean  @default(false)
-  defaultLaunchChoices     Json?
-  defaultRefreshSeconds    Int      @default(15)
-  tablePageSize            Int      @default(20)
-  metadata                 Json?
-  createdAt                DateTime @default(now())
-  updatedAt                DateTime @updatedAt
+  id                      String   @id @default(cuid())
+  userId                  String   @unique
+  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  theme                   String   @default("dark")
+  sidebarCollapsed        Boolean  @default(false)
+  expandedNavigation      Json?
+  tableDensity            String   @default("comfortable")
+  visibleTableColumns     Json?
+  defaultFilters          Json?
+  notificationPreferences Json?
+  reducedMotion           Boolean  @default(false)
+  defaultLaunchChoices    Json?
+  defaultRefreshSeconds   Int      @default(15)
+  tablePageSize           Int      @default(20)
+  metadata                Json?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
 }
 
 model Notification {
@@ -215,15 +542,15 @@ model Notification {
 }
 
 model ApplicationSetting {
-  id                         String   @id @default(cuid())
-  defaultPageSize            Int      @default(20)
-  defaultRegion              String?
-  defaultProject             String?
-  sessionTimeoutMinutes      Int      @default(60)
-  defaultRefreshSeconds      Int      @default(15)
-  estimatedBillingCurrency   String   @default("USD")
-  dateTimeFormat             String   @default("yyyy-MM-dd HH:mm")
-  notificationDefaults       Json?
-  createdAt                  DateTime @default(now())
-  updatedAt                  DateTime @updatedAt
+  id                       String   @id @default(cuid())
+  defaultPageSize          Int      @default(20)
+  defaultRegion            String?
+  defaultProject           String?
+  sessionTimeoutMinutes    Int      @default(60)
+  defaultRefreshSeconds    Int      @default(15)
+  estimatedBillingCurrency String   @default("USD")
+  dateTimeFormat           String   @default("yyyy-MM-dd HH:mm")
+  notificationDefaults     Json?
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
 }

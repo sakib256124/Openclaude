@@ -1,28 +1,79 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { requireApiPermission } from "@/app/api/_utils/auth";
+import { prisma } from "@/lib/prisma";
 
-export async function PATCH() {
+const updateFloatingIpSchema = z.object({
+  instanceId: z.string().trim().min(1).nullable().optional()
+});
+
+type Params = {
+  params: Promise<{ floatingIpId: string }>;
+};
+
+export async function PATCH(request: Request, { params }: Params) {
   const auth = await requireApiPermission("resources:write");
 
   if (!auth.ok) {
     return auth.response;
   }
 
-  return NextResponse.json(
-    { error: { code: "UNSUPPORTED_BY_MULTIPASS", message: "Multipass does not associate floating IPs.", requestId: null } },
-    { status: 400 }
-  );
+  const { floatingIpId } = await params;
+  const parsed = updateFloatingIpSchema.safeParse(await request.json().catch(() => null));
+
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: { code: "VALIDATION_FAILED", message: "Floating IP update is invalid.", fieldErrors: parsed.error.flatten().fieldErrors, requestId: null } },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const instance = parsed.data.instanceId
+      ? await prisma.computeInstance.findFirst({
+          where: { OR: [{ id: parsed.data.instanceId }, { instanceId: parsed.data.instanceId }, { multipassName: parsed.data.instanceId }] }
+        })
+      : null;
+    const floatingIp = await prisma.elasticIpAddress.updateMany({
+      where: { OR: [{ id: floatingIpId }, { allocationId: floatingIpId }, { publicIp: floatingIpId }] },
+      data: {
+        instanceId: instance?.id ?? null,
+        status: instance ? "ASSOCIATED" : "AVAILABLE"
+      }
+    });
+
+    return NextResponse.json({ ok: floatingIp.count > 0 });
+  } catch {
+    return NextResponse.json(
+      { error: { code: "DATABASE_UNAVAILABLE", message: "Floating IP management needs PostgreSQL/Neon to be available.", requestId: null } },
+      { status: 503 }
+    );
+  }
 }
 
-export async function DELETE() {
+export async function DELETE(_request: Request, { params }: Params) {
   const auth = await requireApiPermission("resources:write");
 
   if (!auth.ok) {
     return auth.response;
   }
 
-  return NextResponse.json(
-    { error: { code: "UNSUPPORTED_BY_MULTIPASS", message: "Multipass does not release floating IPs.", requestId: null } },
-    { status: 400 }
-  );
+  const { floatingIpId } = await params;
+
+  try {
+    const floatingIp = await prisma.elasticIpAddress.updateMany({
+      where: { OR: [{ id: floatingIpId }, { allocationId: floatingIpId }, { publicIp: floatingIpId }] },
+      data: {
+        instanceId: null,
+        status: "RELEASED"
+      }
+    });
+
+    return NextResponse.json({ ok: floatingIp.count > 0 });
+  } catch {
+    return NextResponse.json(
+      { error: { code: "DATABASE_UNAVAILABLE", message: "Floating IP management needs PostgreSQL/Neon to be available.", requestId: null } },
+      { status: 503 }
+    );
+  }
 }

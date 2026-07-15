@@ -15,13 +15,13 @@ async function main() {
       email: "rakib@gmail.com",
       name: "Rakib",
       password: "111111",
-      role: Role.USER
+      role: Role.DEVELOPER
     },
     {
       email: "rimon@gmail.com",
       name: "Rimon",
       password: "111111",
-      role: Role.USER
+      role: Role.VIEWER
     }
   ];
 
@@ -104,9 +104,145 @@ async function main() {
     }
   });
 
+  await prisma.machineImage.upsert({
+    where: { slug: "ubuntu-24.04-server" },
+    update: {
+      name: "Ubuntu 24.04 LTS",
+      operatingSystem: "Ubuntu",
+      version: "24.04",
+      visibility: "PUBLIC",
+      status: "AVAILABLE"
+    },
+    create: {
+      imageId: "ami-ubuntu-2404",
+      name: "Ubuntu 24.04 LTS",
+      slug: "ubuntu-24.04-server",
+      operatingSystem: "Ubuntu",
+      version: "24.04",
+      visibility: "PUBLIC",
+      status: "AVAILABLE",
+      description: "Default Ubuntu 24.04 image launched through Multipass."
+    }
+  });
+
+  await prisma.machineImage.upsert({
+    where: { slug: "ubuntu-22.04-server" },
+    update: {
+      name: "Ubuntu 22.04 LTS",
+      operatingSystem: "Ubuntu",
+      version: "22.04",
+      visibility: "PUBLIC",
+      status: "AVAILABLE"
+    },
+    create: {
+      imageId: "ami-ubuntu-2204",
+      name: "Ubuntu 22.04 LTS",
+      slug: "ubuntu-22.04-server",
+      operatingSystem: "Ubuntu",
+      version: "22.04",
+      visibility: "PUBLIC",
+      status: "AVAILABLE",
+      description: "Ubuntu 22.04 image available for lab workloads."
+    }
+  });
+
+  const defaultNetwork = await prisma.virtualNetwork.upsert({
+    where: { networkId: "vpc-local-multipass" },
+    update: {
+      name: "multipass-local",
+      cidr: "10.10.0.0/16",
+      status: "AVAILABLE"
+    },
+    create: {
+      networkId: "vpc-local-multipass",
+      name: "multipass-local",
+      cidr: "10.10.0.0/16",
+      status: "AVAILABLE",
+      description: "Default local Multipass NAT network."
+    }
+  });
+
+  await prisma.subnet.upsert({
+    where: { subnetId: "subnet-local-a" },
+    update: {
+      name: "local-a",
+      cidr: "10.10.9.0/24",
+      availabilityZone: "local",
+      status: "AVAILABLE",
+      networkId: defaultNetwork.id
+    },
+    create: {
+      subnetId: "subnet-local-a",
+      name: "local-a",
+      cidr: "10.10.9.0/24",
+      availabilityZone: "local",
+      status: "AVAILABLE",
+      networkId: defaultNetwork.id
+    }
+  });
+
+  const defaultSecurityGroup = await prisma.securityGroup.upsert({
+    where: { groupId: "sg-web-default" },
+    update: {
+      name: "web-sg",
+      description: "Default lab security group for SSH and web traffic.",
+      networkId: defaultNetwork.id
+    },
+    create: {
+      groupId: "sg-web-default",
+      name: "web-sg",
+      description: "Default lab security group for SSH and web traffic.",
+      networkId: defaultNetwork.id
+    }
+  });
+
+  await prisma.firewallRule.createMany({
+    skipDuplicates: true,
+    data: [
+      {
+        ruleId: "sgr-ssh-default",
+        securityGroupId: defaultSecurityGroup.id,
+        direction: "INGRESS",
+        protocol: "TCP",
+        fromPort: 22,
+        toPort: 22,
+        cidr: "0.0.0.0/0",
+        description: "Allow SSH."
+      },
+      {
+        ruleId: "sgr-http-default",
+        securityGroupId: defaultSecurityGroup.id,
+        direction: "INGRESS",
+        protocol: "TCP",
+        fromPort: 80,
+        toPort: 80,
+        cidr: "0.0.0.0/0",
+        description: "Allow HTTP."
+      },
+      {
+        ruleId: "sgr-https-default",
+        securityGroupId: defaultSecurityGroup.id,
+        direction: "INGRESS",
+        protocol: "TCP",
+        fromPort: 443,
+        toPort: 443,
+        cidr: "0.0.0.0/0",
+        description: "Allow HTTPS."
+      }
+    ]
+  });
+
   await prisma.pricingRule.createMany({
     skipDuplicates: true,
     data: [
+      {
+        name: "Default VM instance hourly estimate",
+        service: "multipass",
+        resourceType: "instance",
+        unit: "INSTANCE_HOUR",
+        unitPrice: "0.010",
+        currency: "USD"
+      },
       {
         name: "Default VM vCPU hourly estimate",
         service: "multipass",

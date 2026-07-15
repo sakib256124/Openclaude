@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const multipassDriverSchema = z.enum(["qemu", "lxd", "hyperv", "virtualbox"]);
-export const roleSchema = z.enum(["ADMIN", "USER", "VIEWER"]);
+export const roleSchema = z.enum(["ADMIN", "DEVELOPER", "USER", "VIEWER"]);
 
 export const serverEnvSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
@@ -29,7 +29,7 @@ export const createUserSchema = z.object({
   name: z.string().trim().min(1).max(120).optional(),
   email: z.string().trim().email().max(255).transform((value) => value.toLowerCase()),
   password: z.string().min(12).max(128),
-  role: roleSchema.default("USER"),
+  role: roleSchema.default("DEVELOPER"),
   isActive: z.boolean().default(true)
 });
 

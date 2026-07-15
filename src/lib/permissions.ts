@@ -2,6 +2,7 @@ import type { Role } from "@prisma/client";
 
 const roleRank: Record<Role, number> = {
   VIEWER: 1,
+  DEVELOPER: 2,
   USER: 2,
   ADMIN: 3
 };
@@ -29,6 +30,7 @@ const permissionsByRole: Record<Role, Permission[]> = {
     "settings:manage",
     "preferences:manage"
   ],
+  DEVELOPER: ["logs:view:own", "resources:read", "resources:write", "preferences:manage"],
   USER: ["logs:view:own", "resources:read", "resources:write", "preferences:manage"],
   VIEWER: ["logs:view:own", "resources:read", "preferences:manage"]
 };

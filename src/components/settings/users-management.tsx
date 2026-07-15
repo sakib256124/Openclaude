@@ -10,7 +10,7 @@ export type ManagedUser = {
   id: string;
   name: string | null;
   email: string;
-  role: "ADMIN" | "USER" | "VIEWER";
+  role: "ADMIN" | "DEVELOPER" | "USER" | "VIEWER";
   isActive: boolean;
   lastLoginAt: string | Date | null;
   createdAt: string | Date;
@@ -30,7 +30,7 @@ const emptyDraft: DraftUser = {
   name: "",
   email: "",
   password: "",
-  role: "USER",
+  role: "DEVELOPER",
   isActive: true
 };
 
@@ -193,6 +193,7 @@ export function UsersManagement({
               onChange={(event) => setDraft((current) => ({ ...current, role: event.target.value as DraftUser["role"] }))}
             >
               <option value="ADMIN">ADMIN</option>
+              <option value="DEVELOPER">DEVELOPER</option>
               <option value="USER">USER</option>
               <option value="VIEWER">VIEWER</option>
             </select>
@@ -222,6 +223,7 @@ export function UsersManagement({
         >
           <option value="ALL">All roles</option>
           <option value="ADMIN">ADMIN</option>
+          <option value="DEVELOPER">DEVELOPER</option>
           <option value="USER">USER</option>
           <option value="VIEWER">VIEWER</option>
         </select>
@@ -298,6 +300,7 @@ export function UsersManagement({
                 }}
               >
                 <option value="ADMIN">ADMIN</option>
+                <option value="DEVELOPER">DEVELOPER</option>
                 <option value="USER">USER</option>
                 <option value="VIEWER">VIEWER</option>
               </select>

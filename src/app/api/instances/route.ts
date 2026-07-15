@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireApiPermission } from "@/app/api/_utils/auth";
 import { multipassErrorResponse } from "@/app/api/_utils/multipass";
+import { recordLaunchedInstance, syncRuntimeInstances } from "@/lib/cloud/instances";
 import { OpenCloudError } from "@/lib/multipass/errors";
 import { createLocalInstance, listLocalInstances } from "@/lib/multipass/local-store";
 import { launchMultipassInstance, listMultipassInstances } from "@/lib/multipass/multipass-cli";
@@ -24,10 +25,10 @@ export async function GET() {
 
   try {
     const instances = await listMultipassInstances();
-    return NextResponse.json({ source: "multipass", instances });
+    return NextResponse.json({ source: "multipass", instances: await syncRuntimeInstances(auth.user, instances) });
   } catch (error) {
     if (error instanceof OpenCloudError && error.code === "SERVICE_UNAVAILABLE") {
-      return NextResponse.json({ source: "local", instances: listLocalInstances() });
+      return NextResponse.json({ source: "local", instances: await syncRuntimeInstances(auth.user, listLocalInstances()) });
     }
 
     return multipassErrorResponse(error);
@@ -59,11 +60,23 @@ export async function POST(request: Request) {
 
   try {
     const instance = await launchMultipassInstance(parsed.data);
-    return NextResponse.json({ instance }, { status: 201 });
+    const record = await recordLaunchedInstance({ user: auth.user, launch: parsed.data, runtime: instance });
+    return NextResponse.json(
+      {
+        instance: instance
+          ? { ...instance, instanceId: record?.instanceId, ownerEmail: record?.ownerEmail }
+          : { name: parsed.data.name, instanceId: record?.instanceId, ownerEmail: record?.ownerEmail }
+      },
+      { status: 201 }
+    );
   } catch (error) {
     if (error instanceof OpenCloudError && error.code === "SERVICE_UNAVAILABLE") {
       const instance = createLocalInstance(parsed.data);
-      return NextResponse.json({ source: "local", instance }, { status: 201 });
+      const record = await recordLaunchedInstance({ user: auth.user, launch: parsed.data, runtime: instance });
+      return NextResponse.json(
+        { source: "local", instance: { ...instance, instanceId: record?.instanceId, ownerEmail: record?.ownerEmail } },
+        { status: 201 }
+      );
     }
 
     return multipassErrorResponse(error);
