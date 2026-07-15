@@ -18,7 +18,10 @@ export function ResourceTable({
   loading,
   emptyTitle,
   emptyDescription,
-  renderMobileCard
+  renderMobileCard,
+  sortKey,
+  sortDirection,
+  onSort
 }: {
   columns: ResourceColumn[];
   rows: ReactNode[][];
@@ -26,6 +29,9 @@ export function ResourceTable({
   emptyTitle: string;
   emptyDescription: string;
   renderMobileCard?: (rowIndex: number) => ReactNode;
+  sortKey?: string;
+  sortDirection?: "asc" | "desc";
+  onSort?: (key: string) => void;
 }) {
   if (loading) {
     return <LoadingSkeleton rows={5} />;
@@ -43,10 +49,19 @@ export function ResourceTable({
             <tr>
               {columns.map((column) => (
                 <th key={column.key} className={cn("h-[42px] px-[14px] font-semibold", column.className)}>
-                  <span className="inline-flex items-center gap-1">
-                    {column.label}
-                    {column.sortable ? <ArrowUpDown className="h-3 w-3" /> : null}
-                  </span>
+                  {column.sortable ? (
+                    <button
+                      className="inline-flex items-center gap-1 text-left uppercase hover:text-foreground"
+                      type="button"
+                      onClick={() => onSort?.(column.key)}
+                    >
+                      {column.label}
+                      <ArrowUpDown className={cn("h-3 w-3", sortKey === column.key ? "text-primary" : undefined)} />
+                      {sortKey === column.key ? <span className="sr-only">Sorted {sortDirection}</span> : null}
+                    </button>
+                  ) : (
+                    <span className="inline-flex items-center gap-1">{column.label}</span>
+                  )}
                 </th>
               ))}
             </tr>

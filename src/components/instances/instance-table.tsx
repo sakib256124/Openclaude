@@ -14,6 +14,7 @@ type InstanceRow = {
   flavor: string;
   privateIp: string;
   az: string;
+  network: string;
   image?: string;
   created?: string;
 };
@@ -23,11 +24,11 @@ const columns = [
   { key: "name", label: "Name", sortable: true },
   { key: "status", label: "Status", sortable: true },
   { key: "power", label: "Power State" },
-  { key: "image", label: "Image" },
-  { key: "flavor", label: "Flavor" },
+  { key: "image", label: "Image", sortable: true },
+  { key: "flavor", label: "Flavor", sortable: true },
   { key: "privateIp", label: "Private IP" },
   { key: "floatingIp", label: "Address" },
-  { key: "az", label: "Availability Zone" },
+  { key: "az", label: "Availability Zone", sortable: true },
   { key: "created", label: "Created", sortable: true },
   { key: "actions", label: "Actions" }
 ];
@@ -52,6 +53,18 @@ export function InstanceTable() {
   const [instances, setInstances] = React.useState<InstanceRow[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [actionPending, setActionPending] = React.useState<string | null>(null);
+  const [search, setSearch] = React.useState("");
+  const [filters, setFilters] = React.useState({
+    status: "",
+    image: "",
+    flavor: "",
+    az: "",
+    network: ""
+  });
+  const [sort, setSort] = React.useState<{ key: keyof InstanceRow; direction: "asc" | "desc" }>({
+    key: "created",
+    direction: "desc"
+  });
 
   React.useEffect(() => {
     let mounted = true;
@@ -79,6 +92,7 @@ export function InstanceTable() {
               flavor: instance.memoryUsage ? `2c-${instance.memoryUsage}` : "m1.medium",
               privateIp: instance.ipv4?.[0] ?? "-",
               az: data.source === "local" ? "local" : "multipass",
+              network: data.source === "local" ? "local-net" : "multipass-nat",
               image: instance.release ?? instance.imageHash ?? "ubuntu-24.04-server",
               created: "Just now"
             }))
@@ -117,7 +131,58 @@ export function InstanceTable() {
     }
   }
 
-  const rows = instances.map((instance) => [
+  function selectOptions(key: keyof InstanceRow) {
+    return Array.from(new Set(instances.map((instance) => instance[key]).filter(Boolean))).sort();
+  }
+
+  function updateFilter(key: keyof typeof filters, value: string) {
+    setFilters((current) => ({ ...current, [key]: value }));
+  }
+
+  function sortBy(key: string) {
+    if (!["name", "status", "image", "flavor", "az", "created"].includes(key)) {
+      return;
+    }
+
+    setSort((current) => ({
+      key: key as keyof InstanceRow,
+      direction: current.key === key && current.direction === "asc" ? "desc" : "asc"
+    }));
+  }
+
+  const filteredInstances = React.useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    return instances
+      .filter((instance) => {
+        const searchable = [
+          instance.name,
+          instance.status,
+          instance.image,
+          instance.flavor,
+          instance.privateIp,
+          instance.az,
+          instance.network
+        ].join(" ").toLowerCase();
+
+        return !query || searchable.includes(query);
+      })
+      .filter((instance) => !filters.status || instance.status === filters.status)
+      .filter((instance) => !filters.image || instance.image === filters.image)
+      .filter((instance) => !filters.flavor || instance.flavor === filters.flavor)
+      .filter((instance) => !filters.az || instance.az === filters.az)
+      .filter((instance) => !filters.network || instance.network === filters.network)
+      .sort((left, right) => {
+        const leftValue = String(left[sort.key] ?? "");
+        const rightValue = String(right[sort.key] ?? "");
+        const compared = leftValue.localeCompare(rightValue, undefined, { numeric: true, sensitivity: "base" });
+        return sort.direction === "asc" ? compared : -compared;
+      });
+  }, [filters, instances, search, sort]);
+
+  const hasActiveFilters = Boolean(search || filters.status || filters.image || filters.flavor || filters.az || filters.network);
+
+  const rows = filteredInstances.map((instance) => [
     <input key={`${instance.name}-select`} type="checkbox" className="h-4 w-4 rounded border" aria-label={`Select ${instance.name}`} />,
     <span key={`${instance.name}-name`} className="font-medium">{instance.name}</span>,
     <StatusBadge key={`${instance.name}-status`} status={instance.status} />,
@@ -147,13 +212,41 @@ export function InstanceTable() {
           <>
             <div className="flex h-[42px] min-w-72 items-center gap-2 rounded-md border bg-background px-3 text-sm text-muted-foreground">
               <Search className="h-4 w-4" />
-              Search instances
+              <input
+                className="h-full w-full bg-transparent text-foreground outline-none placeholder:text-muted-foreground"
+                placeholder="Search instances"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+              />
             </div>
-            {["Status", "Image", "Flavor", "Availability Zone", "Network"].map((filter) => (
-              <button key={filter} className="h-[42px] rounded-md border bg-background px-3 text-sm text-muted-foreground" disabled>
-                {filter}
-              </button>
-            ))}
+            <select className="h-[42px] rounded-md border bg-background px-3 text-sm" value={filters.status} onChange={(event) => updateFilter("status", event.target.value)}>
+              <option value="">Status</option>
+              {selectOptions("status").map((value) => <option key={value} value={value}>{value}</option>)}
+            </select>
+            <select className="h-[42px] rounded-md border bg-background px-3 text-sm" value={filters.image} onChange={(event) => updateFilter("image", event.target.value)}>
+              <option value="">Image</option>
+              {selectOptions("image").map((value) => <option key={value} value={value}>{value}</option>)}
+            </select>
+            <select className="h-[42px] rounded-md border bg-background px-3 text-sm" value={filters.flavor} onChange={(event) => updateFilter("flavor", event.target.value)}>
+              <option value="">Flavor</option>
+              {selectOptions("flavor").map((value) => <option key={value} value={value}>{value}</option>)}
+            </select>
+            <select className="h-[42px] rounded-md border bg-background px-3 text-sm" value={filters.az} onChange={(event) => updateFilter("az", event.target.value)}>
+              <option value="">Availability Zone</option>
+              {selectOptions("az").map((value) => <option key={value} value={value}>{value}</option>)}
+            </select>
+            <select className="h-[42px] rounded-md border bg-background px-3 text-sm" value={filters.network} onChange={(event) => updateFilter("network", event.target.value)}>
+              <option value="">Network</option>
+              {selectOptions("network").map((value) => <option key={value} value={value}>{value}</option>)}
+            </select>
+            {hasActiveFilters ? (
+              <Button variant="ghost" onClick={() => {
+                setSearch("");
+                setFilters({ status: "", image: "", flavor: "", az: "", network: "" });
+              }}>
+                Clear
+              </Button>
+            ) : null}
           </>
         }
         right={
@@ -175,8 +268,11 @@ export function InstanceTable() {
         columns={columns}
         rows={rows}
         loading={loading}
+        sortKey={sort.key}
+        sortDirection={sort.direction}
+        onSort={sortBy}
         emptyTitle="No instances loaded"
-        emptyDescription="Launch an instance to show it here."
+        emptyDescription={hasActiveFilters ? "No instances match the selected filters." : "Launch an instance to show it here."}
       />
     </div>
   );
