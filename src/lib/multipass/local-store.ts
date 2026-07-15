@@ -27,6 +27,10 @@ export function listLocalInstances() {
   return getStore().instances;
 }
 
+export function getLocalInstance(name: string) {
+  return getStore().instances.find((instance) => instance.name === name) ?? null;
+}
+
 export function createLocalInstance(input: MultipassLaunchInput) {
   const store = getStore();
   const existingIndex = store.instances.findIndex((instance) => instance.name === input.name);

@@ -60,7 +60,7 @@ export async function POST(request: Request) {
 
   try {
     const volume = parsed.data.volumeId
-      ? await prisma.volume.findFirst({ where: { OR: [{ id: parsed.data.volumeId }, { volumeId: parsed.data.volumeId }] } })
+      ? await prisma.volume.findFirst({ where: { OR: [{ id: parsed.data.volumeId }, { volumeId: parsed.data.volumeId }, { name: parsed.data.volumeId }] } })
       : null;
     const instance = parsed.data.instanceId
       ? await prisma.computeInstance.findFirst({

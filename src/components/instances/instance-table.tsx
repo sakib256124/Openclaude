@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Columns3, Plus, Search, Trash2 } from "lucide-react";
+import { Play, Plus, Power, RefreshCw, RotateCw, Search, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { FilterBar } from "@/components/ui/filter-bar";
@@ -10,6 +10,7 @@ import { StatusBadge } from "@/components/ui/status-badge";
 
 type InstanceRow = {
   name: string;
+  instanceId?: string;
   status: string;
   flavor: string;
   privateIp: string;
@@ -17,6 +18,9 @@ type InstanceRow = {
   network: string;
   image?: string;
   created?: string;
+  cpu?: number;
+  ramMb?: number;
+  storageGb?: number;
 };
 
 const columns = [
@@ -66,10 +70,8 @@ export function InstanceTable() {
     direction: "desc"
   });
 
-  React.useEffect(() => {
-    let mounted = true;
-
-    async function loadInstances() {
+  const loadInstances = React.useCallback(async () => {
+    setLoading(true);
       try {
         const response = await fetch("/api/instances", { cache: "no-store" });
 
@@ -86,37 +88,61 @@ export function InstanceTable() {
               release?: string;
               imageHash?: string;
               memoryUsage?: string;
+              instanceId?: string;
+              cpu?: number;
+              ramMb?: number;
+              storageGb?: number;
+              createdAt?: string;
             }) => ({
               name: instance.name,
+              instanceId: instance.instanceId,
               status: statusFromState(instance.state ?? "Unknown"),
-              flavor: instance.memoryUsage ? `2c-${instance.memoryUsage}` : "m1.medium",
+              flavor: instance.cpu || instance.ramMb ? `${instance.cpu ?? 1}c-${Math.round((instance.ramMb ?? 2048) / 1024)}G` : instance.memoryUsage ? `2c-${instance.memoryUsage}` : "m1.medium",
               privateIp: instance.ipv4?.[0] ?? "-",
               az: data.source === "local" ? "local" : "multipass",
               network: data.source === "local" ? "local-net" : "multipass-nat",
               image: instance.release ?? instance.imageHash ?? "ubuntu-24.04-server",
-              created: "Just now"
+              created: instance.createdAt ? new Date(instance.createdAt).toLocaleString() : "Just now",
+              cpu: instance.cpu,
+              ramMb: instance.ramMb,
+              storageGb: instance.storageGb
             }))
           : [];
 
-        if (mounted) {
-          setInstances(rows);
-        }
+        setInstances(rows);
       } finally {
-        if (mounted) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
-    }
-
-    loadInstances();
-
-    return () => {
-      mounted = false;
-    };
   }, []);
 
+  React.useEffect(() => {
+    void loadInstances();
+  }, [loadInstances]);
+
+  async function runInstanceAction(name: string, action: "start" | "stop" | "restart") {
+    setActionPending(`${name}:${action}`);
+
+    try {
+      const response = await fetch(`/api/instances/${encodeURIComponent(name)}/actions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action })
+      });
+
+      if (response.ok) {
+        await loadInstances();
+      }
+    } finally {
+      setActionPending(null);
+    }
+  }
+
   async function terminateInstance(name: string) {
-    setActionPending(name);
+    if (!window.confirm(`Terminate ${name}?`)) {
+      return;
+    }
+
+    setActionPending(`${name}:terminate`);
 
     try {
       const response = await fetch(`/api/instances/${encodeURIComponent(name)}`, {
@@ -124,7 +150,7 @@ export function InstanceTable() {
       });
 
       if (response.ok) {
-        setInstances((current) => current.filter((instance) => instance.name !== name));
+        await loadInstances();
       }
     } finally {
       setActionPending(null);
@@ -184,7 +210,9 @@ export function InstanceTable() {
 
   const rows = filteredInstances.map((instance) => [
     <input key={`${instance.name}-select`} type="checkbox" className="h-4 w-4 rounded border" aria-label={`Select ${instance.name}`} />,
-    <span key={`${instance.name}-name`} className="font-medium">{instance.name}</span>,
+    <Link key={`${instance.name}-name`} href={`/instances/${encodeURIComponent(instance.name)}`} className="font-medium text-primary hover:underline">
+      {instance.name}
+    </Link>,
     <StatusBadge key={`${instance.name}-status`} status={instance.status} />,
     instance.status === "ACTIVE" ? "Running" : instance.status === "SHUTOFF" ? "Stopped" : "Pending",
     instance.image ?? "ubuntu-24.04-server",
@@ -193,16 +221,29 @@ export function InstanceTable() {
     instance.privateIp === "-" ? "-" : instance.privateIp,
     instance.az,
     instance.created ?? "2026-07-12",
-    <Button
-      key={`${instance.name}-action`}
-      disabled={actionPending === instance.name}
-      variant="destructive"
-      size="sm"
-      onClick={() => terminateInstance(instance.name)}
-    >
-      <Trash2 />
-      {actionPending === instance.name ? "Terminating" : "Terminate"}
-    </Button>
+    <div key={`${instance.name}-actions`} className="flex flex-wrap gap-2">
+      <Button size="sm" variant="secondary" disabled={Boolean(actionPending)} onClick={() => void runInstanceAction(instance.name, "start")}>
+        <Play />
+        Start
+      </Button>
+      <Button size="sm" variant="secondary" disabled={Boolean(actionPending)} onClick={() => void runInstanceAction(instance.name, "stop")}>
+        <Power />
+        Stop
+      </Button>
+      <Button size="sm" variant="secondary" disabled={Boolean(actionPending)} onClick={() => void runInstanceAction(instance.name, "restart")}>
+        <RotateCw />
+        Restart
+      </Button>
+      <Button
+        disabled={Boolean(actionPending)}
+        variant="destructive"
+        size="sm"
+        onClick={() => void terminateInstance(instance.name)}
+      >
+        <Trash2 />
+        {actionPending === `${instance.name}:terminate` ? "Terminating" : "Terminate"}
+      </Button>
+    </div>
   ]);
 
   return (
@@ -251,9 +292,9 @@ export function InstanceTable() {
         }
         right={
           <>
-            <Button variant="secondary" disabled>
-              <Columns3 />
-              Columns
+            <Button variant="secondary" disabled={loading} onClick={() => void loadInstances()}>
+              <RefreshCw />
+              Refresh
             </Button>
             <Button asChild>
               <Link href="/instances/launch">
