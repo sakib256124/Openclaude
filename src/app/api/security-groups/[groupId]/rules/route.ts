@@ -1,5 +1,15 @@
-import { phaseNotImplemented } from "@/app/api/_utils/not-implemented";
+import { NextResponse } from "next/server";
+import { requireApiPermission } from "@/app/api/_utils/auth";
 
-export function POST() {
-  return phaseNotImplemented("Security group rule create API", "Phase 6", "resources:write");
+export async function POST() {
+  const auth = await requireApiPermission("resources:write");
+
+  if (!auth.ok) {
+    return auth.response;
+  }
+
+  return NextResponse.json(
+    { error: { code: "UNSUPPORTED_BY_MULTIPASS", message: "Configure firewall rules through Ubuntu, not Multipass.", requestId: null } },
+    { status: 400 }
+  );
 }

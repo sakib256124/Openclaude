@@ -1,9 +1,60 @@
-import { phaseNotImplemented } from "@/app/api/_utils/not-implemented";
+import { NextResponse } from "next/server";
+import { z } from "zod";
+import { requireApiPermission } from "@/app/api/_utils/auth";
+import { multipassErrorResponse } from "@/app/api/_utils/multipass";
+import { launchMultipassInstance, listMultipassInstances } from "@/lib/multipass/multipass-cli";
 
-export function GET() {
-  return phaseNotImplemented("Instance list API", "Phase 4");
+const launchSchema = z.object({
+  name: z.string().trim().regex(/^[a-zA-Z0-9][a-zA-Z0-9-]{0,62}$/),
+  image: z.string().trim().min(1).optional(),
+  cpus: z.coerce.number().int().min(1).max(8).optional(),
+  memory: z.string().trim().regex(/^\d+[MG]$/i).optional(),
+  disk: z.string().trim().regex(/^\d+[MG]$/i).optional(),
+  cloudInit: z.string().trim().min(1).optional()
+});
+
+export async function GET() {
+  const auth = await requireApiPermission("resources:read");
+
+  if (!auth.ok) {
+    return auth.response;
+  }
+
+  try {
+    const instances = await listMultipassInstances();
+    return NextResponse.json({ source: "multipass", instances });
+  } catch (error) {
+    return multipassErrorResponse(error);
+  }
 }
 
-export function POST() {
-  return phaseNotImplemented("Instance launch API", "Phase 4", "resources:write");
+export async function POST(request: Request) {
+  const auth = await requireApiPermission("resources:write");
+
+  if (!auth.ok) {
+    return auth.response;
+  }
+
+  const parsed = launchSchema.safeParse(await request.json().catch(() => null));
+
+  if (!parsed.success) {
+    return NextResponse.json(
+      {
+        error: {
+          code: "VALIDATION_FAILED",
+          message: "Multipass launch details are invalid.",
+          fieldErrors: parsed.error.flatten().fieldErrors,
+          requestId: null
+        }
+      },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const instance = await launchMultipassInstance(parsed.data);
+    return NextResponse.json({ instance }, { status: 201 });
+  } catch (error) {
+    return multipassErrorResponse(error);
+  }
 }

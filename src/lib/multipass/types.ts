@@ -15,4 +15,27 @@ export type MultipassInstance = {
   ipv4: string[];
   release?: string;
   imageHash?: string;
+  load?: string[];
+  diskUsage?: string;
+  memoryUsage?: string;
+  mountCount?: number;
+};
+
+export type MultipassLaunchInput = {
+  name: string;
+  image?: string;
+  cpus?: number;
+  memory?: string;
+  disk?: string;
+  cloudInit?: string;
+};
+
+export type MultipassAction = "start" | "stop" | "restart" | "suspend";
+
+export type MultipassHealth = {
+  configured: boolean;
+  status: "healthy" | "unavailable";
+  binary: string;
+  version: string | null;
+  message: string;
 };

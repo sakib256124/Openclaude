@@ -1,5 +1,13 @@
-import { phaseNotImplemented } from "@/app/api/_utils/not-implemented";
+import { NextResponse } from "next/server";
+import { requireApiPermission } from "@/app/api/_utils/auth";
+import { multipassFlavorCatalog } from "@/lib/multipass/catalog";
 
-export function GET() {
-  return phaseNotImplemented("Flavor list API", "Phase 5");
+export async function GET() {
+  const auth = await requireApiPermission("resources:read");
+
+  if (!auth.ok) {
+    return auth.response;
+  }
+
+  return NextResponse.json({ flavors: multipassFlavorCatalog });
 }

@@ -10,7 +10,8 @@ export type NormalizedErrorCode =
   | "NETWORK_TIMEOUT"
   | "TLS_ERROR"
   | "MISSING_HOST"
-  | "METRICS_UNAVAILABLE";
+  | "METRICS_UNAVAILABLE"
+  | "COMMAND_FAILED";
 
 export class OpenCloudError extends Error {
   constructor(

@@ -1,9 +1,28 @@
-import { phaseNotImplemented } from "@/app/api/_utils/not-implemented";
+import { NextResponse } from "next/server";
+import { requireApiPermission } from "@/app/api/_utils/auth";
 
-export function GET() {
-  return phaseNotImplemented("Network address list API", "Phase 6");
+export async function GET() {
+  const auth = await requireApiPermission("resources:read");
+
+  if (!auth.ok) {
+    return auth.response;
+  }
+
+  return NextResponse.json({
+    floatingIps: [],
+    capability: "Multipass exposes private/NAT addresses from each VM; floating IP allocation is not managed."
+  });
 }
 
-export function POST() {
-  return phaseNotImplemented("Network address allocation API", "Phase 6", "resources:write");
+export async function POST() {
+  const auth = await requireApiPermission("resources:write");
+
+  if (!auth.ok) {
+    return auth.response;
+  }
+
+  return NextResponse.json(
+    { error: { code: "UNSUPPORTED_BY_MULTIPASS", message: "Multipass does not allocate floating IPs.", requestId: null } },
+    { status: 400 }
+  );
 }

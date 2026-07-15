@@ -1,9 +1,28 @@
-import { phaseNotImplemented } from "@/app/api/_utils/not-implemented";
+import { NextResponse } from "next/server";
+import { requireApiPermission } from "@/app/api/_utils/auth";
 
-export function PATCH() {
-  return phaseNotImplemented("Network address association API", "Phase 6", "resources:write");
+export async function PATCH() {
+  const auth = await requireApiPermission("resources:write");
+
+  if (!auth.ok) {
+    return auth.response;
+  }
+
+  return NextResponse.json(
+    { error: { code: "UNSUPPORTED_BY_MULTIPASS", message: "Multipass does not associate floating IPs.", requestId: null } },
+    { status: 400 }
+  );
 }
 
-export function DELETE() {
-  return phaseNotImplemented("Network address release API", "Phase 6", "resources:write");
+export async function DELETE() {
+  const auth = await requireApiPermission("resources:write");
+
+  if (!auth.ok) {
+    return auth.response;
+  }
+
+  return NextResponse.json(
+    { error: { code: "UNSUPPORTED_BY_MULTIPASS", message: "Multipass does not release floating IPs.", requestId: null } },
+    { status: 400 }
+  );
 }

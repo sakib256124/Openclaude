@@ -4,7 +4,7 @@ Browser components never call Multipass directly. They call local `/api/*` route
 
 ## Implemented in Phase 1
 
-All required API routes exist and return a structured `501 PHASE_NOT_IMPLEMENTED` response until their owning phase is implemented.
+Multipass-backed API routes return live data when the Ubuntu host has the `multipass` CLI installed. If the CLI is missing, the routes return a structured service-unavailable response instead of crashing.
 
 ## Implemented in Phase 1.5
 
@@ -15,8 +15,8 @@ Example response:
 ```json
 {
   "error": {
-    "code": "PHASE_NOT_IMPLEMENTED",
-    "message": "Instance list API is planned for Phase 4.",
+    "code": "SERVICE_UNAVAILABLE",
+    "message": "Multipass CLI was not found. Install Multipass on Ubuntu with: sudo snap install multipass.",
     "requestId": null
   }
 }

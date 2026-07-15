@@ -97,10 +97,9 @@ Unit, integration, and end-to-end test suites are scaffolded in `tests/`. Concre
 ## Known Limitations
 
 - Login is not active until Phase 2.
-- Multipass CLI connection and command execution starts in Phase 3.
-- VM, image, network, storage, and metrics endpoints currently return explicit `501` phase responses.
-- No fake utilization metrics are displayed.
-- Phase 1.5 pages use designed unavailable states until real Multipass integration exists.
+- VM list, launch, details, lifecycle actions, and delete require the host `multipass` CLI.
+- This development machine returns a safe unavailable response when Multipass is not installed.
+- Advanced storage, floating IP, and security-group APIs return Multipass-specific unsupported responses because Multipass does not expose those cloud-provider concepts directly.
 
 ## Screenshots
 

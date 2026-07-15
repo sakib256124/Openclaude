@@ -11,8 +11,14 @@ export const serverEnvSchema = z.object({
   CREDENTIAL_ENCRYPTION_KEY: z.string().min(32),
   MULTIPASS_DEFAULT_HOST: z.string().default("localhost"),
   MULTIPASS_DEFAULT_DRIVER: multipassDriverSchema.default("qemu"),
+  MULTIPASS_BIN: z.string().default("multipass"),
+  MULTIPASS_DEFAULT_IMAGE: z.string().default("24.04"),
+  MULTIPASS_DEFAULT_CPUS: z.coerce.number().int().positive().default(1),
+  MULTIPASS_DEFAULT_MEMORY: z.string().default("2G"),
+  MULTIPASS_DEFAULT_DISK: z.string().default("10G"),
   MULTIPASS_SOCKET_PATH: z.string().optional(),
   MULTIPASS_REQUEST_TIMEOUT_MS: z.coerce.number().int().positive().default(30_000),
+  MULTIPASS_LAUNCH_TIMEOUT_MS: z.coerce.number().int().positive().default(180_000),
   RATE_LIMIT_WINDOW_SECONDS: z.coerce.number().int().positive().default(60),
   RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(120)
 });

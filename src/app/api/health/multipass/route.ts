@@ -1,5 +1,7 @@
-import { phaseNotImplemented } from "@/app/api/_utils/not-implemented";
+import { NextResponse } from "next/server";
+import { getMultipassHealth } from "@/lib/multipass/multipass-cli";
 
-export function GET() {
-  return phaseNotImplemented("Multipass health check API", "Phase 3");
+export async function GET() {
+  const health = await getMultipassHealth();
+  return NextResponse.json({ health }, { status: health.configured ? 200 : 503 });
 }

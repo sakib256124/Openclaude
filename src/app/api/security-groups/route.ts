@@ -1,9 +1,28 @@
-import { phaseNotImplemented } from "@/app/api/_utils/not-implemented";
+import { NextResponse } from "next/server";
+import { requireApiPermission } from "@/app/api/_utils/auth";
 
-export function GET() {
-  return phaseNotImplemented("Security group list API", "Phase 6");
+export async function GET() {
+  const auth = await requireApiPermission("resources:read");
+
+  if (!auth.ok) {
+    return auth.response;
+  }
+
+  return NextResponse.json({
+    securityGroups: [],
+    capability: "Use Ubuntu firewall rules on the host or inside each VM for Multipass labs."
+  });
 }
 
-export function POST() {
-  return phaseNotImplemented("Security group create API", "Phase 6", "resources:write");
+export async function POST() {
+  const auth = await requireApiPermission("resources:write");
+
+  if (!auth.ok) {
+    return auth.response;
+  }
+
+  return NextResponse.json(
+    { error: { code: "UNSUPPORTED_BY_MULTIPASS", message: "Multipass does not provide security-group APIs.", requestId: null } },
+    { status: 400 }
+  );
 }
