@@ -38,18 +38,19 @@ type AppJwtFields = {
   isActive?: boolean;
 };
 
-function getSeedAdminUser(email: string, password: string) {
-  const seedEmail = process.env.SEED_ADMIN_EMAIL?.toLowerCase();
-  const seedPassword = process.env.SEED_ADMIN_PASSWORD;
+function getLocalDemoUser(email: string, password: string) {
+  const allowAnyLocalLogin =
+    process.env.LOCAL_DEMO_LOGIN_ANY === "true" ||
+    (process.env.NODE_ENV !== "production" && process.env.LOCAL_DEMO_LOGIN_ANY !== "false");
 
-  if (!seedEmail || !seedPassword || email !== seedEmail || password !== seedPassword) {
+  if (!allowAnyLocalLogin || !email || !password) {
     return null;
   }
 
   return {
-    id: "seed-admin",
-    email: seedEmail,
-    name: process.env.SEED_ADMIN_NAME ?? "Demo Admin",
+    id: `local-demo-${email}`,
+    email,
+    name: email.split("@")[0] || "Local Demo User",
     role: "ADMIN" as Role,
     isActive: true
   };
@@ -96,7 +97,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
-        const seedAdmin = getSeedAdminUser(parsed.data.email, parsed.data.password);
+        const localDemoUser = getLocalDemoUser(parsed.data.email, parsed.data.password);
 
         let user: Awaited<ReturnType<typeof prisma.user.findUnique>> = null;
 
@@ -105,17 +106,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             where: { email: parsed.data.email }
           });
         } catch {
-          return seedAdmin;
+          return localDemoUser;
         }
 
         if (!user?.passwordHash || !user.isActive) {
-          return seedAdmin;
+          return localDemoUser;
         }
 
         const validPassword = await verifyPassword(parsed.data.password, user.passwordHash);
 
         if (!validPassword) {
-          return seedAdmin;
+          return localDemoUser;
         }
 
         try {
