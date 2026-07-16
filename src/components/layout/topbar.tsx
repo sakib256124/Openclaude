@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { Bell, ChevronDown, Cloud, Folder, LogOut, Menu, RefreshCw, UserCircle } from "lucide-react";
 import * as React from "react";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
+import { GlobalSearch } from "@/components/layout/global-search";
 import { Button } from "@/components/ui/button";
 import { ConnectionBadge } from "@/components/ui/connection-badge";
 import type { AppSessionUser } from "@/lib/auth";
@@ -28,6 +30,8 @@ export function Topbar({ user, notificationCount, onOpenMobileNav }: TopbarProps
         </div>
         <div className="text-sm font-semibold leading-5 lg:hidden">OpenCloud</div>
       </div>
+
+      <GlobalSearch />
 
       <div className="flex items-center gap-2">
         <div className="hidden items-center gap-2 lg:flex">
@@ -73,6 +77,12 @@ export function Topbar({ user, notificationCount, onOpenMobileNav }: TopbarProps
                   {user.role}
                 </div>
               </div>
+              <Button asChild className="mt-3 w-full justify-start" variant="ghost" size="sm">
+                <Link href="/profile">
+                  <UserCircle />
+                  Profile
+                </Link>
+              </Button>
               <Button
                 className="mt-3 w-full justify-start"
                 variant="ghost"

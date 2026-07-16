@@ -6,11 +6,13 @@
 - Multipass integration for instance list, launch, start, stop, restart, suspend, and terminate.
 - Local fallback mode when Multipass is not installed, useful for classroom demo and UI validation.
 - Demo login mode for localhost, with production opt-out through `LOCAL_DEMO_LOGIN_ANY=false`.
+- Public self-registration and protected profile access.
 - Functional instance launch form, instance table filtering, sorting, and terminate action.
 - PostgreSQL/Prisma models for users, sessions, activity logs, operations, pricing, preferences, notifications, and application settings.
 - EC2-style persisted control-plane models for instances, images, networks, subnets, security groups, firewall rules, key pairs, elastic IPs, volumes, snapshots, and usage records.
 - IAM role model for `ADMIN`, `DEVELOPER`, and `VIEWER`, while retaining legacy `USER` compatibility.
 - Resource APIs for images, networks, key pairs, security groups, firewall rules, volumes, snapshots, billing, and monitoring.
+- Global resource search across the main EC2-style resource inventories.
 
 ## Incomplete Or Partially Implemented
 

@@ -2,7 +2,7 @@
 
 ## Summary
 
-The app is no longer only a static EC2-looking UI. Instance lifecycle, images, key pairs, networks, security groups, addresses, volumes, snapshots, monitoring, billing, users, settings, and logs now have protected API routes. The main remaining limitation is infrastructure enforcement: Multipass can create and control VMs, but AWS-only primitives such as VPC security groups, Elastic IP routing, and EBS block devices are represented in the control-plane database unless host-level automation is added.
+The app now includes protected API routes for instance lifecycle, images, key pairs, networks, security groups, addresses, volumes, snapshots, monitoring, billing, users, settings, logs, registration, and profile access. The main remaining limitation is infrastructure enforcement: Multipass can create and control VMs, but AWS-only primitives such as VPC security groups, Elastic IP routing, and EBS block devices are represented in the control-plane database unless host-level automation is added.
 
 ## Pages
 
@@ -19,7 +19,10 @@ The app is no longer only a static EC2-looking UI. Instance lifecycle, images, k
 - Snapshots and Volume Snapshots: API-backed create/list/delete through `/api/snapshots`.
 - Monitoring: fetches `/api/metrics`; shows live Multipass/local estimates and instance health rows.
 - Billing: fetches `/api/billing`; calculates estimates from persisted resources and pricing rules.
+- Global Search: topbar search queries `/api/search` across instances, images, key pairs, networks, security groups, addresses, volumes, and snapshots.
 - Users and Roles: API-backed user CRUD, roles, active state, reset password, and admin protection.
+- Authentication: login, logout, and public self-registration are wired to password hashing and NextAuth sessions.
+- Profile: protected profile page shows account status and preferences.
 - Activity Logs: database-backed, permission-filtered.
 - Settings: database-backed general settings and Multipass configuration display.
 
@@ -38,5 +41,4 @@ The app is no longer only a static EC2-looking UI. Instance lifecycle, images, k
 - Host firewall enforcement: security-group rules need iptables/ufw automation if required.
 - Real block volume mounting: Multipass supports mounts, not AWS EBS; host path provisioning can be added.
 - Immutable billing records: add scheduled usage aggregation into `UsageRecord`.
-- Global search across all resources: instance table search works; top-level global search is not yet implemented.
 - Dark/light toggle persistence: theme setting exists, but full toggle UI can be expanded.

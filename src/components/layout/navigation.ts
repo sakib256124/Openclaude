@@ -16,6 +16,7 @@ import {
   Settings,
   Shield,
   SlidersHorizontal,
+  UserCircle,
   UserCog
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -82,6 +83,7 @@ export const navigationGroups: NavigationGroup[] = [
     id: "administration",
     label: "Administration",
     items: [
+      { href: "/profile", label: "Profile", icon: UserCircle },
       { href: "/settings/multipass", label: "Multipass Host", icon: CloudCog },
       { href: "/settings/users", label: "Users and Roles", icon: UserCog },
       { href: "/settings/general", label: "Settings", icon: Settings },

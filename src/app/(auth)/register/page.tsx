@@ -1,17 +1,17 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { LogoMark } from "@/components/layout/logo-mark";
-import { LoginForm } from "@/components/auth/login-form";
+import { RegisterForm } from "@/components/auth/register-form";
 import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/auth";
 
-type LoginPageProps = {
+type RegisterPageProps = {
   searchParams?: Promise<{
     callbackUrl?: string;
   }>;
 };
 
-export default async function LoginPage({ searchParams }: LoginPageProps) {
+export default async function RegisterPage({ searchParams }: RegisterPageProps) {
   const user = await getCurrentUser();
 
   if (user) {
@@ -27,15 +27,15 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <div className="mb-8 flex items-center gap-3">
           <LogoMark />
           <div>
-            <h1 className="text-xl font-semibold">OpenCloud Compute Console</h1>
-            <p className="text-sm text-muted-foreground">Sign in with your OpenCloud account.</p>
+            <h1 className="text-xl font-semibold">Create OpenCloud account</h1>
+            <p className="text-sm text-muted-foreground">Register to access the compute console.</p>
           </div>
         </div>
-        <LoginForm callbackUrl={callbackUrl} />
+        <RegisterForm callbackUrl={callbackUrl} />
         <div className="mt-6 flex items-center justify-between text-sm text-muted-foreground">
-          <span>Need an account?</span>
+          <span>Already have an account?</span>
           <Button asChild variant="ghost" size="sm">
-            <Link href="/register">Register</Link>
+            <Link href="/login">Sign in</Link>
           </Button>
         </div>
       </section>
