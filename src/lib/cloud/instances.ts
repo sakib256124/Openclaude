@@ -2,6 +2,7 @@ import "server-only";
 import type { ComputeInstance, ComputeInstanceStatus, Prisma } from "@prisma/client";
 import type { AppSessionUser } from "@/lib/auth";
 import { createCloudResourceId } from "@/lib/cloud/resource-ids";
+import { ownedWhere } from "@/lib/cloud/ownership";
 import type { MultipassInstance, MultipassLaunchInput } from "@/lib/multipass/types";
 import { prisma } from "@/lib/prisma";
 
@@ -12,6 +13,7 @@ type LaunchRecordInput = {
 };
 
 type ActionRecordInput = {
+  user: AppSessionUser;
   name: string;
   runtime: MultipassInstance | null;
   fallbackStatus?: ComputeInstanceStatus;
@@ -111,6 +113,19 @@ function runtimeUpdate(runtime: MultipassInstance): Prisma.ComputeInstanceUnchec
 export async function recordLaunchedInstance({ user, launch, runtime }: LaunchRecordInput) {
   const now = new Date();
   const privateIp = runtime?.ipv4[0] ?? null;
+  const launchMetadata = {
+    source: "multipass",
+    description: launch.description ?? null,
+    instanceType: launch.instanceType ?? null,
+    operatingSystem: launch.operatingSystem ?? null,
+    networkId: launch.networkId ?? null,
+    subnetId: launch.subnetId ?? null,
+    securityGroupId: launch.securityGroupId ?? null,
+    keyPairName: launch.keyPairName ?? null,
+    cloudInitConfigured: Boolean(launch.cloudInit),
+    diskUsage: runtime?.diskUsage ?? launch.disk ?? null,
+    memoryUsage: runtime?.memoryUsage ?? launch.memory ?? null
+  };
 
   try {
     return await prisma.computeInstance.upsert({
@@ -126,8 +141,14 @@ export async function recordLaunchedInstance({ user, launch, runtime }: LaunchRe
         cpu: launch.cpus ?? Number(process.env.MULTIPASS_DEFAULT_CPUS ?? 1),
         ramMb: memoryToMb(launch.memory),
         storageGb: diskToGb(launch.disk),
+        availabilityZone: launch.availabilityZone ?? "local",
         launchedAt: now,
         terminatedAt: null,
+        metadata: {
+          ...launchMetadata,
+          ipv4: runtime?.ipv4 ?? (privateIp ? [privateIp] : []),
+          load: runtime?.load ?? []
+        },
         ...ownerFields(user)
       },
       create: {
@@ -136,20 +157,19 @@ export async function recordLaunchedInstance({ user, launch, runtime }: LaunchRe
         name: launch.name,
         status: runtime ? runtimeStatus(runtime.state) : "RUNNING",
         powerState: runtime?.state ?? "Running",
-        operatingSystem: runtime?.release ?? "Ubuntu",
+        operatingSystem: launch.operatingSystem ?? runtime?.release ?? "Ubuntu",
         imageRef: launch.image ?? runtime?.imageHash ?? process.env.MULTIPASS_DEFAULT_IMAGE ?? "24.04",
         cpu: launch.cpus ?? Number(process.env.MULTIPASS_DEFAULT_CPUS ?? 1),
         ramMb: memoryToMb(launch.memory),
         storageGb: diskToGb(launch.disk),
         privateIp,
-        availabilityZone: "local",
+        availabilityZone: launch.availabilityZone ?? "local",
         launchedAt: now,
         lastSyncedAt: now,
         metadata: {
-          source: "multipass",
+          ...launchMetadata,
           ipv4: runtime?.ipv4 ?? [],
-          diskUsage: runtime?.diskUsage ?? launch.disk ?? null,
-          memoryUsage: runtime?.memoryUsage ?? launch.memory ?? null
+          load: runtime?.load ?? []
         },
         ...ownerFields(user)
       }
@@ -200,12 +220,22 @@ export async function syncRuntimeInstances(user: AppSessionUser, instances: Mult
   }
 }
 
-export async function recordInstanceAction({ name, runtime, fallbackStatus }: ActionRecordInput) {
+export async function recordInstanceAction({ user, name, runtime, fallbackStatus }: ActionRecordInput) {
   try {
     const status = runtime ? runtimeStatus(runtime.state) : fallbackStatus;
+    const target = await prisma.computeInstance.findFirst({
+      where: {
+        AND: [{ OR: [{ multipassName: name }, { name }] }, ownedWhere(user)]
+      },
+      select: { id: true }
+    });
+
+    if (!target) {
+      return null;
+    }
 
     return await prisma.computeInstance.updateMany({
-      where: { OR: [{ multipassName: name }, { name }] },
+      where: { id: target.id },
       data: {
         ...(runtime ? runtimeUpdate(runtime) : {}),
         ...(status ? { status } : {}),
@@ -218,6 +248,6 @@ export async function recordInstanceAction({ name, runtime, fallbackStatus }: Ac
   }
 }
 
-export async function markInstanceTerminated(name: string) {
-  return recordInstanceAction({ name, runtime: null, fallbackStatus: "TERMINATED" });
+export async function markInstanceTerminated(name: string, user: AppSessionUser) {
+  return recordInstanceAction({ name, runtime: null, fallbackStatus: "TERMINATED", user });
 }

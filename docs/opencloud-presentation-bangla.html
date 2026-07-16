@@ -337,7 +337,7 @@
     </section>
 
     <section class="slide">
-      <p class="eyebrow">Multipass Integration Plan</p>
+      <p class="eyebrow">Multipass Integration</p>
       <h2>Multipass workflow mapping</h2>
       <div class="grid">
         <div class="box">
@@ -369,9 +369,34 @@
         <li>Role-based access control: ADMIN, USER, VIEWER.</li>
         <li>Application settings, user preferences, notifications এবং activity logs.</li>
         <li>Dashboard shell, sidebar navigation, responsive UI states.</li>
-        <li>API route structure এবং future Multipass integration-এর জন্য server-only modules.</li>
+        <li>Instance API Multipass CLI call করে; CLI unavailable হলে safe local fallback নেয়।</li>
+        <li>Images, key pairs, networks, security groups, volumes, snapshots, billing এবং search API-backed.</li>
       </ul>
       <div class="footer"><span>Implemented Features</span><span>Slide 6</span></div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">AWS Concept Coverage</p>
+      <h2>IAM এবং EC2 concept mapping</h2>
+      <div class="grid">
+        <div class="box">
+          <h3>IAM</h3>
+          <p>Users, password hash, active status, ADMIN/DEVELOPER/USER/VIEWER role, permission map, audit log.</p>
+        </div>
+        <div class="box">
+          <h3>EC2 Launch</h3>
+          <p>Instance name, OS image, EC2-style flavor, CPU, RAM, disk, availability zone and instance count.</p>
+        </div>
+        <div class="box">
+          <h3>User Data</h3>
+          <p>Launch form থেকে cloud-init script নেওয়া হয় এবং backend Multipass launch-এ temporary file হিসেবে pass করে।</p>
+        </div>
+        <div class="box">
+          <h3>Network Security</h3>
+          <p>Key pair, network, subnet, security group and firewall rule control-plane আছে; host enforcement future scope.</p>
+        </div>
+      </div>
+      <div class="footer"><span>AWS Concept Coverage</span><span>Slide 7</span></div>
     </section>
 
     <section class="slide">
@@ -403,7 +428,7 @@
           <p>Login, user create/update, settings change safe audit message সহ record হয়।</p>
         </div>
       </div>
-      <div class="footer"><span>Security</span><span>Slide 7</span></div>
+      <div class="footer"><span>Security</span><span>Slide 8</span></div>
     </section>
 
     <section class="slide light">
@@ -429,7 +454,7 @@
       <p class="note">
         Multipass resource state duplicate করে database-এ full copy রাখা হয় না; Multipass VM state source of truth হিসেবে ধরা হয়েছে।
       </p>
-      <div class="footer"><span>Database Design</span><span>Slide 8</span></div>
+      <div class="footer"><span>Database Design</span><span>Slide 9</span></div>
     </section>
 
     <section class="slide">
@@ -446,7 +471,7 @@ npm run dev</div>
         Local app: http://localhost:3000<br />
         Docker Nginx proxy: http://localhost:8080
       </p>
-      <div class="footer"><span>Run Process</span><span>Slide 9</span></div>
+      <div class="footer"><span>Run Process</span><span>Slide 10</span></div>
     </section>
 
     <section class="slide light">
@@ -454,14 +479,14 @@ npm run dev</div>
       <h2>বর্তমান limitation এবং honest status</h2>
       <ul>
         <li>Authentication, user-role, settings, logs এবং UI foundation ready.</li>
-        <li>Multipass live CLI integration এখন phase-wise placeholder হিসেবে রাখা হয়েছে।</li>
-        <li>Instance, key pair, image, network, volume, metrics API এখন authenticated 501 response দিতে পারে।</li>
-        <li>Fake cloud data দেখানো হয়নি, যাতে demo misleading না হয়।</li>
+        <li>Instance list, launch, action এবং details Multipass CLI try করে; CLI না থাকলে local fallback নেয়।</li>
+        <li>Cloud-like resources database/control-plane level-এ API-backed.</li>
+        <li>AWS-only concepts যেমন true Elastic IP routing বা EBS block device host automation ছাড়া limited.</li>
       </ul>
       <p class="note">
-        এই design future integration-এর জন্য safe foundation তৈরি করে: আগে secure shell, তারপর live cloud actions.
+        এই design real infrastructure না থাকলেও app crash না করে honest fallback এবং clear limitation দেখায়।
       </p>
-      <div class="footer"><span>Current Status</span><span>Slide 10</span></div>
+      <div class="footer"><span>Current Status</span><span>Slide 11</span></div>
     </section>
 
     <section class="slide">
@@ -476,7 +501,7 @@ npm run dev</div>
         <li>Password এবং host access secret কীভাবে secure রাখা হয়েছে?</li>
         <li>Current limitation কী এবং next phase-এ কী implement করবেন?</li>
       </ul>
-      <div class="footer"><span>Possible Questions</span><span>Slide 11</span></div>
+      <div class="footer"><span>Possible Questions</span><span>Slide 12</span></div>
     </section>
 
     <section class="slide light">
@@ -484,8 +509,8 @@ npm run dev</div>
       <h2>Summary</h2>
       <p class="subtitle">
         OpenCloud Compute Console একটি secure, scalable foundation যেখানে user authentication, role management,
-        database-backed settings, activity log এবং cloud dashboard UI তৈরি করা হয়েছে। Future phase-এ এই foundation-এর
-        উপর host access, Multipass VM, Multipass image, Multipass network, Multipass storage এবং Telemetry integration complete করা যাবে।
+        database-backed settings, activity log এবং cloud dashboard UI তৈরি করা হয়েছে। Future phase-এ true metrics collector,
+        host firewall automation, browser SSH terminal এবং stronger storage automation যোগ করা যাবে।
       </p>
       <div class="pill-row">
         <span class="pill">Secure</span>
@@ -493,7 +518,7 @@ npm run dev</div>
         <span class="pill">Multipass-ready</span>
         <span class="pill">Dockerized</span>
       </div>
-      <div class="footer"><span>Thank You</span><span>Slide 12</span></div>
+      <div class="footer"><span>Thank You</span><span>Slide 13</span></div>
     </section>
   </body>
 </html>

@@ -165,8 +165,8 @@
           hoyechilo. Ami eta AWS diye kori nai; eta Ubuntu Multipass-based EC2-inspired prototype. Ekhane EC2 console-er main
           workflow-gulo rakha hoyeche: dashboard, instances, launch instance, key pairs, images, security groups,
           volumes, network address, monitoring, billing, user role and settings. Current version-e UI, authentication,
-          database, role permission, audit log and API structure ready ache. Real Multipass CLI integration phase-wise
-          complete korte hobe.
+          database, role permission, audit log and API structure ready ache. Instance workflow Multipass CLI try kore,
+          CLI na thakle safe local fallback use kore. AWS-only kichu concept database/control-plane level-e represented.
         </div>
 
         <div class="box warning">
@@ -186,7 +186,7 @@
           <p class="answer">
             Sir, eta full production EC2 clone na, eta EC2 console-er core idea follow kore banano academic prototype.
             EC2-er moto compute resource management-er pages and workflows ekhane ache. Backend AWS-er bodole Multipass
-            API target kore design kora.
+            CLI target kore design kora.
           </p>
         </div>
 
@@ -196,14 +196,14 @@
             <li>EC2-te instance launch, key pair, security group, image, volume, IP, monitoring thake.</li>
             <li>Amar console-e oi same module-gular page, UI flow and API route structure ache.</li>
             <li>AWS API use korini, karon AWS proprietary platform. Instead Ubuntu Multipass CLI/daemon use korar plan.</li>
-            <li>Current demo-te safe placeholder ache, fake running VM dekhano hoyni.</li>
+            <li>Multipass CLI thakle real VM action try kore; na thakle safe local fallback/unavailable state dekhay.</li>
           </ul>
         </div>
 
         <div class="script">
           Sir, clone mane ami exact AWS copy kori nai. Ami EC2-er workflow clone korechi: instance manage, key pair,
-          security group, image, volume, network address and monitoring. Backend architecture Multipass-er jonno ready,
-          tai eta vendor-neutral private cloud console hisebe kaj korbe.
+          security group, image, volume, network address and monitoring. Backend architecture Multipass VM management-er jonno
+          ready, tai eta local/private lab VM console hisebe kaj korte pare.
         </div>
       </section>
 
@@ -240,9 +240,9 @@
         <div class="box">
           <h3>Question: AWS ar Ubuntu Multipass-er moddhe difference ki?</h3>
           <p class="answer">
-            AWS holo Amazon-er public cloud provider. User Amazon-er infrastructure rent kore. Ubuntu Multipass holo local VM manager
-            cloud platform, ja nijer server/private cloud/lab environment-e deploy kora jay. Amar project AWS-er official
-            API use kore na; eta Multipass CLI target kore.
+            AWS holo Amazon-er public cloud provider. User Amazon-er infrastructure rent kore. Ubuntu Multipass holo lightweight
+            local VM manager, ja nijer computer/server-e Ubuntu VM run korte help kore. Amar project AWS-er official API use
+            kore na; eta Multipass CLI target kore.
           </p>
         </div>
 
@@ -259,9 +259,9 @@
           <div class="box">
             <h3>Multipass</h3>
             <ul>
-              <li>Open-source cloud platform</li>
-              <li>Private cloud possible</li>
-              <li>Multipass VM, Multipass image, Multipass network, Multipass storage</li>
+              <li>Lightweight local VM manager</li>
+              <li>Lab/server environment-e useful</li>
+              <li>Ubuntu VM, image aliases, networks and mounts</li>
               <li>University/lab/server environment-e useful</li>
             </ul>
           </div>
@@ -270,6 +270,48 @@
         <div class="script">
           Sir, EC2 hocche AWS-er compute service. Ami oi compute console-er concept follow korechi, but backend-e
           Multipass VM command layer use korar architecture rekhechi.
+        </div>
+      </section>
+
+      <section>
+        <h2>4A. IAM & EC2 Topic-gulo Project-e Kivabe Map Korben</h2>
+
+        <div class="box">
+          <h3>Short Answer</h3>
+          <p class="answer">
+            Sir, AWS IAM/EC2-er sob service directly use kori nai, but academic project-er scope-e jeta possible
+            ta implement/mapping korechi. User, role, permission, password security, server-side CLI layer, instance launch,
+            instance type, User Data, security group, key pair, volume and monitoring concept project-e ache.
+          </p>
+        </div>
+
+        <div class="grid">
+          <div class="box">
+            <h3>IAM Mapping</h3>
+            <ul>
+              <li><strong>Users:</strong> login account, password hash, active status.</li>
+              <li><strong>Groups/Policies:</strong> exact IAM group JSON policy na; RBAC permission map.</li>
+              <li><strong>Roles:</strong> ADMIN, DEVELOPER, USER, VIEWER.</li>
+              <li><strong>Security:</strong> bcrypt password, reset flow, API permission, audit log.</li>
+              <li><strong>Access Keys:</strong> AWS key issue kora hoy na; host secret server-side encrypted model.</li>
+            </ul>
+          </div>
+          <div class="box">
+            <h3>EC2 Mapping</h3>
+            <ul>
+              <li><strong>EC2 Instance:</strong> Multipass VM + ComputeInstance record.</li>
+              <li><strong>Instance type:</strong> flavor, CPU, RAM, disk selection.</li>
+              <li><strong>User Data:</strong> launch form theke cloud-init script.</li>
+              <li><strong>EBS:</strong> volumes/snapshots model; real block storage future.</li>
+              <li><strong>Security Group:</strong> database/API rule model; host firewall future.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="script">
+          Sir, amar project-e AWS IAM-er exact managed service nei, but same security idea ache: user, role, permission,
+          password policy, audit log. EC2-er exact public cloud infrastructure nei, but same compute workflow ache:
+          instance launch, OS/image, CPU/RAM/storage flavor, user data, key pair, security group and lifecycle action.
         </div>
       </section>
 
@@ -395,27 +437,27 @@
         <div class="box">
           <h3>Question: Current limitation ki?</h3>
           <p class="answer">
-            Current version-e authentication, role management, UI shell, settings, activity log and API structure ready.
-            Kintu live Multipass operation fully connected na. Instances, key pair, images, networks, volumes and metrics
-            route currently phase placeholder response dite pare.
+            Current version-e authentication, role management, UI shell, settings, activity log and API route ready.
+            Instance workflow Multipass CLI call korar chesta kore, and CLI unavailable hole local fallback use kore.
+            Limitation holo AWS-only feature-gulo, jemon true Elastic IP routing, EBS-style block volume, and firewall
+            enforcement host automation chara fully real infrastructure-level na.
           </p>
         </div>
 
         <div class="box">
           <h3>Next phase-e ki korben?</h3>
           <ol>
-            <li>host access host setting login and token cache.</li>
-            <li>Multipass VM diye real instance list, launch, start, stop, reboot, delete.</li>
-            <li>Multipass image and size profile list.</li>
-            <li>Multipass network, bridged address, and firewall workflow.</li>
-            <li>Multipass storage mount, unmount, and disk workflow.</li>
-            <li>Telemetry metrics available thakle monitoring.</li>
+            <li>True historical metrics collector add kora.</li>
+            <li>Browser SSH terminal-er jonno safe websocket/session broker.</li>
+            <li>Host firewall automation diye security group enforce kora.</li>
+            <li>Multipass mount-based storage workflow aro production-ready kora.</li>
+            <li>Billing usage scheduler diye immutable usage record kora.</li>
           </ol>
         </div>
 
         <div class="script">
-          Sir, ami fake VM data dekhai nai. Current version foundation ready koreche, tarpor real cloud API integration
-          add korle production-like behavior pawa jabe.
+          Sir, ami fake VM data dekhai nai. Multipass thakle real VM action try korbe, na thakle local fallback/unavailable
+          state show korbe. Future-e host-level automation add korle aro production-like behavior pawa jabe.
         </div>
       </section>
 
@@ -453,7 +495,7 @@
             <strong>User login:</strong> rakib@gmail.com / 111111 diye normal user perspective dekhate paren.
           </li>
           <li>
-            <strong>Limitations:</strong> honestly bolben real Multipass integration next phase.
+            <strong>Limitations:</strong> honestly bolben AWS-only infrastructure features host automation chara limited.
           </li>
         </ol>
       </section>
@@ -464,8 +506,9 @@
         <div class="box">
           <h3>Q: Eta ki fully functional?</h3>
           <p class="answer">
-            Fully production functional na. Eta academic prototype where UI, auth, database, permission and API
-            architecture ready. Real Multipass integration remaining.
+            Full public-cloud production platform na. Eta academic prototype where UI, auth, database, permission,
+            API architecture and core instance workflow ready. Host machine-e Multipass thakle VM action try kore,
+            otherwise safe fallback use kore.
           </p>
         </div>
 
@@ -503,8 +546,9 @@
           images, network, volume, monitoring, billing, settings and user-role management-er structure ready korechi.
           Authentication Auth.js diye, database PostgreSQL and Prisma diye, permission role-based, password bcrypt diye
           secure, and future host access secret encryption-er helper ache. Browser direct Multipass call kore na; sob request
-          protected Next.js API route diye server-side Multipass layer-e jabe. Real Multipass CLI integration ekhono next
-          phase, but architecture and demo workflow EC2 console-er moto ready.
+          protected Next.js API route diye server-side Multipass layer-e jay. Host machine-e Multipass CLI thakle real VM
+          action try kore, na thakle safe fallback response dey. AWS-only kichu feature host automation chara limited,
+          but architecture and demo workflow EC2 console-er moto ready.
         </div>
 
         <div class="box warning">

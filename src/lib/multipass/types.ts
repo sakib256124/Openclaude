@@ -28,6 +28,14 @@ export type MultipassLaunchInput = {
   memory?: string;
   disk?: string;
   cloudInit?: string;
+  description?: string;
+  availabilityZone?: string;
+  instanceType?: string;
+  operatingSystem?: string;
+  networkId?: string;
+  subnetId?: string;
+  securityGroupId?: string;
+  keyPairName?: string;
 };
 
 export type MultipassAction = "start" | "stop" | "restart" | "suspend";

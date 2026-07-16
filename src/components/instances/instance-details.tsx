@@ -3,6 +3,7 @@
 import * as React from "react";
 import { InstanceActions } from "@/components/instances/instance-actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CopyButton } from "@/components/ui/copy-button";
 import { QuotaProgress } from "@/components/ui/quota-progress";
 import { StatusBadge } from "@/components/ui/status-badge";
 
@@ -22,7 +23,14 @@ type Instance = {
   privateIp?: string | null;
   publicIp?: string | null;
   availabilityZone?: string;
+  ownerEmail?: string | null;
+  ownerName?: string | null;
+  network?: { networkId: string; name: string; cidr: string } | null;
+  securityGroup?: { groupId: string; name: string } | null;
+  image?: { imageId: string; name: string; slug: string } | null;
+  launchedAt?: string | null;
   createdAt?: string;
+  updatedAt?: string | null;
 };
 
 function statusFromState(state?: string) {
@@ -77,6 +85,8 @@ export function InstanceDetails({ instanceId }: { instanceId: string }) {
   const ramPercent = instance?.state === "Running" ? 48 : 0;
   const diskPercent = instance?.diskUsage ? 44 : 0;
   const ip = instance?.privateIp ?? instance?.ipv4?.[0] ?? "-";
+  const multipassShellCommand = `multipass shell ${instance?.name ?? instanceId}`;
+  const sshCommand = ip === "-" ? "Waiting for instance IP address" : `ssh ubuntu@${ip}`;
 
   return (
     <section className="space-y-4">
@@ -124,6 +134,14 @@ export function InstanceDetails({ instanceId }: { instanceId: string }) {
                 <dt className="text-muted-foreground">Availability zone</dt>
                 <dd className="mt-1">{instance?.availabilityZone ?? "local"}</dd>
               </div>
+              <div>
+                <dt className="text-muted-foreground">Owner</dt>
+                <dd className="mt-1">{instance?.ownerName ?? instance?.ownerEmail ?? "-"}</dd>
+              </div>
+              <div>
+                <dt className="text-muted-foreground">Created</dt>
+                <dd className="mt-1">{instance?.createdAt ? new Date(instance.createdAt).toLocaleString() : "-"}</dd>
+              </div>
             </dl>
           )}
         </CardContent>
@@ -136,7 +154,8 @@ export function InstanceDetails({ instanceId }: { instanceId: string }) {
           <CardContent className="space-y-3 text-sm">
             <div className="flex justify-between"><span className="text-muted-foreground">Private address</span><span className="font-mono text-xs">{ip}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Public address</span><span className="font-mono text-xs">{instance?.publicIp ?? "-"}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Network</span><span>multipass-nat</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Network</span><span>{instance?.network?.name ?? "multipass-nat"}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Security group</span><span>{instance?.securityGroup?.name ?? "-"}</span></div>
           </CardContent>
         </Card>
         <Card>
@@ -160,6 +179,27 @@ export function InstanceDetails({ instanceId }: { instanceId: string }) {
           </CardContent>
         </Card>
       </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Access</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-3 text-sm md:grid-cols-2">
+          <div className="rounded-md border bg-background p-3">
+            <div className="text-xs text-muted-foreground">Multipass shell</div>
+            <div className="mt-2 break-all font-mono text-xs">{multipassShellCommand}</div>
+            <div className="mt-2">
+              <CopyButton value={multipassShellCommand} label="Copy" />
+            </div>
+          </div>
+          <div className="rounded-md border bg-background p-3">
+            <div className="text-xs text-muted-foreground">SSH command</div>
+            <div className="mt-2 break-all font-mono text-xs">{sshCommand}</div>
+            <div className="mt-2">
+              <CopyButton value={sshCommand} label="Copy" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </section>
   );
 }

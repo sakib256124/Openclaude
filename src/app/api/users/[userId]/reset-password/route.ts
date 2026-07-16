@@ -24,7 +24,7 @@ export async function POST(request: Request, { params }: Params) {
       {
         error: {
           code: "VALIDATION_ERROR",
-          message: "Password must be at least 12 characters.",
+          message: "Password must be at least 5 characters.",
           fieldErrors: parsed.error.flatten().fieldErrors,
           requestId: null
         }

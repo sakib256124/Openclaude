@@ -3,6 +3,20 @@ import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/password";
 import { registerUserSchema } from "@/lib/validators";
 
+function deriveDisplayName(email: string) {
+  const localPart = email.split("@")[0] ?? "";
+  const cleaned = localPart.replace(/[._-]+/g, " ").trim();
+
+  if (!cleaned) {
+    return "OpenCloud user";
+  }
+
+  return cleaned
+    .split(/\s+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 export async function POST(request: Request) {
   const parsed = registerUserSchema.safeParse(await request.json().catch(() => null));
 
@@ -39,7 +53,7 @@ export async function POST(request: Request) {
 
   const user = await prisma.user.create({
     data: {
-      name: parsed.data.name,
+      name: parsed.data.name ?? deriveDisplayName(parsed.data.email),
       email: parsed.data.email,
       passwordHash: await hashPassword(parsed.data.password),
       role: "USER",

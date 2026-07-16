@@ -90,8 +90,15 @@ export function InstanceActions({
     }
   }
 
-  function terminalNotice() {
-    setMessage("Browser terminal backend is not enabled yet. Use Multipass shell on Ubuntu: multipass shell " + instanceId);
+  async function copyShellCommand() {
+    const command = `multipass shell ${instanceId}`;
+
+    try {
+      await navigator.clipboard.writeText(command);
+      setMessage(`Shell command copied: ${command}`);
+    } catch {
+      setMessage(`Use Multipass shell on Ubuntu: ${command}`);
+    }
   }
 
   return (
@@ -113,9 +120,9 @@ export function InstanceActions({
           <Camera />
           {pending === "snapshot" ? "Creating" : "Snapshot"}
         </Button>
-        <Button variant="secondary" disabled={Boolean(pending)} onClick={terminalNotice}>
+        <Button variant="secondary" disabled={Boolean(pending)} onClick={() => void copyShellCommand()}>
           <Terminal />
-          Terminal
+          Copy shell command
         </Button>
         <Button variant="destructive" disabled={Boolean(pending)} onClick={() => void deleteInstance()}>
           <Trash2 />

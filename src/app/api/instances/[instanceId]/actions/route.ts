@@ -2,11 +2,13 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireApiPermission } from "@/app/api/_utils/auth";
 import { multipassErrorResponse } from "@/app/api/_utils/multipass";
+import { ownedWhere } from "@/lib/cloud/ownership";
 import { recordInstanceAction } from "@/lib/cloud/instances";
 import { OpenCloudError } from "@/lib/multipass/errors";
 import { runLocalInstanceAction } from "@/lib/multipass/local-store";
 import { runMultipassInstanceAction } from "@/lib/multipass/multipass-cli";
 import { normalizeMultipassName } from "@/lib/multipass/normalizers";
+import { prisma } from "@/lib/prisma";
 
 const actionSchema = z.object({
   action: z.enum(["start", "stop", "restart", "suspend"])
@@ -31,9 +33,27 @@ export async function POST(request: Request, { params }: Params) {
     return NextResponse.json({ error: { code: "VALIDATION_FAILED", message: "Invalid Multipass action request.", requestId: null } }, { status: 400 });
   }
 
+  let record: { id: string } | null;
+
+  try {
+    record = await prisma.computeInstance.findFirst({
+      where: { AND: [{ OR: [{ multipassName: name }, { name }] }, ownedWhere(auth.user)] },
+      select: { id: true }
+    });
+  } catch {
+    return NextResponse.json(
+      { error: { code: "DATABASE_UNAVAILABLE", message: "Instance records need PostgreSQL/Neon to be available.", requestId: null } },
+      { status: 503 }
+    );
+  }
+
+  if (!record) {
+    return NextResponse.json({ error: { code: "NOT_FOUND", message: "Instance was not found.", requestId: null } }, { status: 404 });
+  }
+
   try {
     const instance = await runMultipassInstanceAction(name, parsed.data.action);
-    await recordInstanceAction({ name, runtime: instance });
+    await recordInstanceAction({ user: auth.user, name, runtime: instance });
     return NextResponse.json({ instance });
   } catch (error) {
     if (error instanceof OpenCloudError && error.code === "SERVICE_UNAVAILABLE") {
@@ -43,7 +63,7 @@ export async function POST(request: Request, { params }: Params) {
         return NextResponse.json({ error: { code: "NOT_FOUND", message: "Instance was not found.", requestId: null } }, { status: 404 });
       }
 
-      await recordInstanceAction({ name, runtime: instance });
+      await recordInstanceAction({ user: auth.user, name, runtime: instance });
       return NextResponse.json({ source: "local", instance });
     }
 

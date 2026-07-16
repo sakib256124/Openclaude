@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="bn">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Openclaude Project Report Bangla</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 17mm;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: #f8fafc;
+        color: #0f172a;
+        font-family: "Nirmala UI", "Vrinda", "SolaimanLipi", "Noto Sans Bengali", Arial, sans-serif;
+        font-size: 14px;
+        line-height: 1.68;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      .cover {
+        min-height: 260mm;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        page-break-after: always;
+        padding: 30mm 22mm;
+        border: 1px solid #cbd5e1;
+        background:
+          linear-gradient(140deg, rgba(20, 184, 166, 0.18), transparent 44%),
+          linear-gradient(315deg, rgba(245, 158, 11, 0.14), transparent 40%),
+          #0f172a;
+        color: #f8fafc;
+      }
+
+      .tag {
+        color: #5eead4;
+        font-size: 15px;
+        font-weight: 800;
+      }
+
+      .cover h1 {
+        max-width: 150mm;
+        margin-top: 16px;
+        font-size: 40px;
+        line-height: 1.25;
+      }
+
+      .cover .subtitle {
+        max-width: 150mm;
+        margin-top: 18px;
+        color: #cbd5e1;
+        font-size: 18px;
+      }
+
+      .meta {
+        margin-top: 32px;
+        color: #dbeafe;
+        font-size: 15px;
+      }
+
+      section {
+        page-break-after: always;
+      }
+
+      h2 {
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 3px solid #14b8a6;
+        color: #0f172a;
+        font-size: 25px;
+        line-height: 1.35;
+      }
+
+      h3 {
+        margin: 18px 0 7px;
+        color: #0f766e;
+        font-size: 17px;
+      }
+
+      .lead {
+        margin-bottom: 14px;
+        color: #334155;
+        font-size: 15px;
+      }
+
+      ul,
+      ol {
+        margin: 8px 0 0;
+        padding-left: 22px;
+      }
+
+      li {
+        margin: 5px 0;
+      }
+
+      .box {
+        margin: 12px 0;
+        padding: 12px 14px;
+        break-inside: avoid;
+        border: 1px solid #cbd5e1;
+        border-left: 5px solid #14b8a6;
+        border-radius: 8px;
+        background: #ffffff;
+      }
+
+      .warning {
+        border-left-color: #f59e0b;
+        background: #fffbeb;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .flow {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .step {
+        padding: 10px 12px;
+        border-radius: 8px;
+        background: #e0f2fe;
+        color: #0f172a;
+        font-weight: 700;
+      }
+
+      .code {
+        margin: 10px 0;
+        padding: 12px 14px;
+        border-radius: 8px;
+        background: #0f172a;
+        color: #dbeafe;
+        font-family: "Cascadia Mono", Consolas, monospace;
+        font-size: 12px;
+        line-height: 1.6;
+        white-space: pre-line;
+      }
+
+      table {
+        width: 100%;
+        margin-top: 10px;
+        border-collapse: collapse;
+        background: #ffffff;
+      }
+
+      th,
+      td {
+        padding: 9px 10px;
+        border: 1px solid #cbd5e1;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: #ccfbf1;
+        color: #134e4a;
+      }
+
+      .small {
+        color: #64748b;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="cover">
+        <div class="tag">Project Report</div>
+        <h1>Openclaude / OpenCloud Compute Console</h1>
+        <p class="subtitle">
+          Ubuntu Multipass virtual machine manage করার জন্য EC2-inspired secure web dashboard.
+        </p>
+        <div class="meta">
+          <p><strong>Project type:</strong> University final/project demonstration</p>
+          <p><strong>Application name:</strong> OpenCloud Compute Console</p>
+          <p><strong>Workspace/folder name:</strong> Openclaude</p>
+          <p><strong>Core stack:</strong> Next.js, TypeScript, PostgreSQL, Prisma, Auth.js, Tailwind CSS</p>
+        </div>
+      </div>
+
+      <section>
+        <h2>1. Project Overview</h2>
+        <p class="lead">
+          Openclaude project-এর main application হলো <strong>OpenCloud Compute Console</strong>. এটি একটি cloud compute
+          management dashboard, যেখানে user browser থেকে virtual machine এবং related cloud resource manage করতে পারে।
+          Project-টি AWS EC2-এর concept দ্বারা inspired, কিন্তু এটি AWS-এর official code, API, logo বা console copy করে না।
+          Backend target করা হয়েছে Ubuntu Multipass VM management layer।
+        </p>
+
+        <div class="box">
+          <h3>Short Definition</h3>
+          <p>
+            OpenCloud Compute Console হলো Ubuntu Multipass VM launch, list, start, stop, restart, delete, monitor এবং
+            database-backed cloud resource organize করার জন্য একটি secure web console prototype।
+          </p>
+        </div>
+
+        <div class="box warning">
+          <h3>Sir-ke bolte hobe</h3>
+          <p>
+            “Sir, eta exact AWS EC2 clone na. Eta EC2-inspired academic cloud console. UI workflow EC2-er moto, but backend
+            Ubuntu Multipass target kore design kora.”
+          </p>
+        </div>
+      </section>
+
+      <section>
+        <h2>2. Problem Statement</h2>
+        <p class="lead">
+          সাধারণভাবে VM manage করতে terminal command জানা লাগে। যেমন Multipass ব্যবহার করলে user-কে
+          <strong>multipass launch</strong>, <strong>multipass list</strong>, <strong>multipass stop</strong> ইত্যাদি command
+          চালাতে হয়। Non-expert user বা academic lab environment-এ এটা কঠিন এবং ভুল command দিলে resource loss হতে পারে।
+        </p>
+
+        <div class="grid">
+          <div class="box">
+            <h3>Existing Problem</h3>
+            <ul>
+              <li>VM command line দিয়ে manage করতে হয়।</li>
+              <li>User, role, audit log এবং permission centralized থাকে না।</li>
+              <li>Resource status এক জায়গায় দেখা যায় না।</li>
+              <li>Destructive operation যেমন delete-এর আগে UI confirmation থাকে না।</li>
+            </ul>
+          </div>
+          <div class="box">
+            <h3>Project Solution</h3>
+            <ul>
+              <li>Browser-based dashboard তৈরি করা হয়েছে।</li>
+              <li>Authentication ও role-based permission আছে।</li>
+              <li>Instance, image, network, volume, billing, logs এক console-এ আছে।</li>
+              <li>Safe API response ও confirmation workflow রাখা হয়েছে।</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>3. Objectives</h2>
+        <div class="box">
+          <h3>Main Objective</h3>
+          <p>
+            Ubuntu Multipass VM এবং related cloud resources manage করার জন্য secure, role-based, web-based cloud compute
+            console তৈরি করা।
+          </p>
+        </div>
+
+        <div class="box">
+          <h3>Specific Objectives</h3>
+          <ol>
+            <li>User login, logout, registration এবং password reset workflow তৈরি করা।</li>
+            <li>Role অনুযায়ী resource read/write/manage permission enforce করা।</li>
+            <li>VM instance list, launch, details, start, stop, restart, terminate workflow তৈরি করা।</li>
+            <li>Images, key pairs, networks, security groups, volumes, snapshots, floating IP-এর page/API তৈরি করা।</li>
+            <li>Dashboard, monitoring, billing estimate এবং activity logs দেখানো।</li>
+            <li>Multipass unavailable হলে app crash না করে safe local/unavailable response দেখানো।</li>
+          </ol>
+        </div>
+      </section>
+
+      <section>
+        <h2>4. Technology Stack</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Layer</th>
+              <th>Technology</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Frontend</td>
+              <td>Next.js App Router, React, TypeScript</td>
+              <td>Dashboard pages, console layout, forms, tables, details views</td>
+            </tr>
+            <tr>
+              <td>Styling</td>
+              <td>Tailwind CSS, shadcn/ui style components, Lucide icons</td>
+              <td>Professional dark console UI and reusable components</td>
+            </tr>
+            <tr>
+              <td>Backend</td>
+              <td>Next.js API Route Handlers</td>
+              <td>Authenticated server API for resources and actions</td>
+            </tr>
+            <tr>
+              <td>Database</td>
+              <td>PostgreSQL, Prisma ORM</td>
+              <td>User, roles, resources, logs, pricing rules, preferences</td>
+            </tr>
+            <tr>
+              <td>Authentication</td>
+              <td>Auth.js / NextAuth, bcrypt password hashing</td>
+              <td>Secure session and credentials login</td>
+            </tr>
+            <tr>
+              <td>Validation</td>
+              <td>Zod</td>
+              <td>API payload validation and stable error handling</td>
+            </tr>
+            <tr>
+              <td>VM Layer</td>
+              <td>Ubuntu Multipass CLI</td>
+              <td>Launch, list, inspect and control local Ubuntu VMs</td>
+            </tr>
+            <tr>
+              <td>Testing</td>
+              <td>Vitest, Playwright, TypeScript typecheck</td>
+              <td>Unit test, e2e test scaffold and build confidence</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>AWS IAM & EC2 Concept Coverage</h2>
+        <p class="lead">
+          Project-টি AWS service use করে না, কিন্তু IAM এবং EC2 section-এর যতগুলো concept local/private VM console-এ
+          যুক্তিসঙ্গতভাবে map করা যায় সেগুলো application, database, API এবং documentation level-এ রাখা হয়েছে।
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>AWS concept</th>
+              <th>OpenCloud implementation</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>IAM Users</td>
+              <td>Auth.js credentials user, bcrypt password hash, active/inactive account</td>
+              <td>Implemented</td>
+            </tr>
+            <tr>
+              <td>Groups / Policies</td>
+              <td>Formal IAM group JSON policy engine নেই; role permission map দিয়ে equivalent access control করা হয়েছে</td>
+              <td>Mapped as RBAC</td>
+            </tr>
+            <tr>
+              <td>Roles</td>
+              <td>ADMIN, DEVELOPER, USER, VIEWER role and server-side permission check</td>
+              <td>Implemented</td>
+            </tr>
+            <tr>
+              <td>MFA + Password Policy</td>
+              <td>Password length validation, hashing, reset flow আছে; MFA future work হিসেবে রাখা হয়েছে</td>
+              <td>Partial</td>
+            </tr>
+            <tr>
+              <td>AWS CLI / SDK</td>
+              <td>AWS CLI/SDK নয়; backend server-side Multipass CLI service layer ব্যবহার করে</td>
+              <td>Equivalent concept</td>
+            </tr>
+            <tr>
+              <td>Access Keys</td>
+              <td>AWS access key issue করা হয় না; optional host secret encrypted server-side storage model আছে</td>
+              <td>Not applicable / safe alternative</td>
+            </tr>
+            <tr>
+              <td>EC2 Instance</td>
+              <td>ComputeInstance model, instances page, launch/details/action API, Multipass VM runtime</td>
+              <td>Implemented</td>
+            </tr>
+            <tr>
+              <td>Instance type and sizing</td>
+              <td>Launch form-এ EC2-style flavor, CPU, RAM, disk, OS/image selection</td>
+              <td>Implemented</td>
+            </tr>
+            <tr>
+              <td>EC2 User Data</td>
+              <td>Launch form User Data textarea, API validation, Multipass cloud-init temporary file handling</td>
+              <td>Implemented</td>
+            </tr>
+            <tr>
+              <td>EBS / EFS / Instance Store</td>
+              <td>Volumes, snapshots and storage records আছে; real EBS/EFS equivalent host automation future work</td>
+              <td>Partial</td>
+            </tr>
+            <tr>
+              <td>ELB / ASG</td>
+              <td>Load balancer and auto scaling real workflow current scope-এর বাইরে</td>
+              <td>Future scope</td>
+            </tr>
+            <tr>
+              <td>Security Groups</td>
+              <td>Security group and firewall rule CRUD API/database; host firewall enforcement future work</td>
+              <td>Control-plane implemented</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>5. System Architecture</h2>
+        <p class="lead">
+          এই project-এ browser কখনো সরাসরি Multipass command চালায় না। Browser শুধু internal API route call করে।
+          API route user authentication, permission এবং validation check করে server-only Multipass module call করে।
+        </p>
+
+        <div class="flow">
+          <div class="step">1. User browser থেকে action দেয়</div>
+          <div class="step">2. Next.js page অথবা React component local API call করে</div>
+          <div class="step">3. API route session এবং role permission verify করে</div>
+          <div class="step">4. Server-only Multipass service CLI command execute করে</div>
+          <div class="step">5. Runtime response normalized DTO আকারে frontend-এ ফেরত যায়</div>
+        </div>
+
+        <div class="code">Browser
+  -> Next.js frontend
+  -> /api/* route handler
+  -> requireApiPermission()
+  -> server-only Multipass module
+  -> multipass CLI / local fallback
+  -> normalized JSON response</div>
+      </section>
+
+      <section>
+        <h2>6. Main Modules</h2>
+        <div class="grid">
+          <div class="box">
+            <h3>Compute</h3>
+            <ul>
+              <li>Dashboard overview</li>
+              <li>Instances list and details</li>
+              <li>Launch instance form</li>
+              <li>Start, stop, restart, terminate actions</li>
+            </ul>
+          </div>
+          <div class="box">
+            <h3>Storage</h3>
+            <ul>
+              <li>Volumes</li>
+              <li>Volume attach/detach</li>
+              <li>Snapshots and volume snapshots</li>
+              <li>Image-backed VM records</li>
+            </ul>
+          </div>
+          <div class="box">
+            <h3>Network & Security</h3>
+            <ul>
+              <li>Networks</li>
+              <li>Floating IP addresses</li>
+              <li>Security groups and rules</li>
+              <li>Key pairs</li>
+            </ul>
+          </div>
+          <div class="box">
+            <h3>Administration</h3>
+            <ul>
+              <li>Users and roles</li>
+              <li>Settings and Multipass config</li>
+              <li>Activity logs</li>
+              <li>Profile and preferences</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>7. Database Design</h2>
+        <p class="lead">
+          Database full Multipass runtime duplicate করে না; বরং user, ownership, permission, metadata, billing estimate
+          এবং audit information রাখে। VM-এর live state Multipass থেকে sync করা হয়।
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>User, Account, Session</td>
+              <td>Authentication, session, role and active account management</td>
+            </tr>
+            <tr>
+              <td>ComputeInstance</td>
+              <td>VM instance record, owner, status, CPU, RAM, storage, IP and timestamps</td>
+            </tr>
+            <tr>
+              <td>MachineImage, Snapshot</td>
+              <td>Image catalog, instance image and backup/snapshot representation</td>
+            </tr>
+            <tr>
+              <td>VirtualNetwork, Subnet, SecurityGroup</td>
+              <td>Network and access-control concept for EC2-like workflow</td>
+            </tr>
+            <tr>
+              <td>Volume, ElasticIpAddress, KeyPair</td>
+              <td>Storage, public address and SSH key resource records</td>
+            </tr>
+            <tr>
+              <td>PricingRule, UsageRecord</td>
+              <td>Billing estimate and usage accounting foundation</td>
+            </tr>
+            <tr>
+              <td>ActivityLog, Notification, ResourceOperation</td>
+              <td>Audit trail, user notification and long-running operation history</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>8. Authentication & Permission</h2>
+        <p class="lead">
+          Project-এ Auth.js credentials login ব্যবহার করা হয়েছে। Password bcrypt hashing দিয়ে verify করা হয়।
+          User active না হলে login/session reject হয়। API route-এ centralized <strong>requireApiPermission</strong> helper
+          ব্যবহার করা হয়েছে।
+        </p>
+
+        <div class="grid">
+          <div class="box">
+            <h3>Roles</h3>
+            <ul>
+              <li><strong>ADMIN:</strong> users, settings, pricing, all logs and resources manage করতে পারে।</li>
+              <li><strong>USER/DEVELOPER:</strong> own resources read/write করতে পারে।</li>
+              <li><strong>VIEWER:</strong> resource read করতে পারে, destructive write করতে পারে না।</li>
+            </ul>
+          </div>
+          <div class="box">
+            <h3>Security Controls</h3>
+            <ul>
+              <li>Server-only Multipass modules</li>
+              <li>Zod request validation</li>
+              <li>Encrypted optional host secret storage</li>
+              <li>Safe audit log messages</li>
+              <li>Confirmation dialog for destructive actions</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>9. API & Multipass Integration</h2>
+        <p class="lead">
+          Instance API route বাস্তবে Multipass CLI call করার চেষ্টা করে। যদি host machine-এ Multipass installed না থাকে,
+          তাহলে structured safe response বা local fallback ব্যবহার করা হয়, যাতে demo/app crash না করে।
+        </p>
+
+        <div class="box">
+          <h3>Example: Launch Instance Flow</h3>
+          <ol>
+            <li>User launch form submit করে।</li>
+            <li><strong>/api/instances</strong> POST route request পায়।</li>
+            <li>Zod দিয়ে name, image, CPU, memory, disk validate হয়।</li>
+            <li>Permission <strong>resources:write</strong> check করা হয়।</li>
+            <li>Multipass command <strong>multipass launch</strong> execute হয়।</li>
+            <li>Database-এ ComputeInstance record upsert হয়।</li>
+            <li>UI instance response দেখায়।</li>
+          </ol>
+        </div>
+
+        <div class="code">multipass launch 24.04 --name demo-vm --cpus 2 --memory 2G --disk 10G
+multipass list --format json
+multipass info demo-vm --format json
+multipass stop demo-vm
+multipass delete demo-vm --purge</div>
+      </section>
+
+      <section>
+        <h2>10. User Interface</h2>
+        <p class="lead">
+          UI dark console style-এ বানানো হয়েছে, যেন cloud dashboard-এর মতো professional feel হয়। Layout-এ sidebar,
+          topbar, global search, resource tables, status badges, empty/error/loading states, confirmation dialog এবং
+          responsive components আছে।
+        </p>
+
+        <div class="box">
+          <h3>Important UI Features</h3>
+          <ul>
+            <li>Dashboard metrics and instance status chart</li>
+            <li>Resource tables with search, filter, sort and refresh</li>
+            <li>Details drawer/page for individual resource</li>
+            <li>Global search across cloud resources</li>
+            <li>Toast notification and destructive confirmation</li>
+            <li>Unavailable state instead of fake VM data</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2>11. Testing & Deployment</h2>
+        <div class="grid">
+          <div class="box">
+            <h3>Testing Commands</h3>
+            <div class="code">npm run typecheck
+npm run test
+npm run test:e2e</div>
+            <p class="small">TypeScript, Vitest and Playwright configuration project-e included ache.</p>
+          </div>
+          <div class="box">
+            <h3>Run Commands</h3>
+            <div class="code">cp .env.example .env
+npm install
+docker compose up -d postgres
+npm run prisma:migrate
+npm run db:seed
+npm run dev</div>
+          </div>
+        </div>
+
+        <div class="box">
+          <h3>Docker Support</h3>
+          <p>
+            Project-এ Dockerfile, docker-compose.yml এবং Nginx config আছে। PostgreSQL service Docker Compose দিয়ে run করা
+            যায় এবং app port 3000 অথবা Nginx port 8080 দিয়ে expose করা যায়।
+          </p>
+        </div>
+      </section>
+
+      <section>
+        <h2>12. Limitations</h2>
+        <div class="box warning">
+          <h3>Current Limitation</h3>
+          <ul>
+            <li>Multipass host machine-এ installed না থাকলে real VM create হবে না; local fallback/unavailable response দেখাবে।</li>
+            <li>Security group rules database/API level-এ আছে; real host firewall automation আলাদা কাজ।</li>
+            <li>Multipass AWS EBS-style block volume directly দেয় না; mount-based implementation দরকার।</li>
+            <li>True historical metrics-এর জন্য periodic collector বা guest agent লাগবে।</li>
+            <li>Browser SSH terminal-এর জন্য websocket/session broker দরকার।</li>
+          </ul>
+        </div>
+
+        <div class="box">
+          <h3>Sir-ke bolben</h3>
+          <p>
+            “Sir, ami fake data diye app full complete dekhai nai. Jekhane real infrastructure nai, sekhane safe
+            unavailable/local fallback diyechi. Eta production-quality honest handling.”
+          </p>
+        </div>
+      </section>
+
+      <section>
+        <h2>13. Future Work</h2>
+        <ol>
+          <li>Full Multipass host configuration wizard এবং health check improve করা।</li>
+          <li>Metrics collector service add করে CPU, memory, disk, network historical chart তৈরি করা।</li>
+          <li>Browser-based SSH terminal safe websocket broker দিয়ে implement করা।</li>
+          <li>Host-level firewall automation দিয়ে security group rule enforce করা।</li>
+          <li>UsageRecord scheduler দিয়ে billing estimate আরও accurate করা।</li>
+          <li>Automated e2e tests এবং production deployment hardening করা।</li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>14. Conclusion</h2>
+        <p class="lead">
+          Openclaude / OpenCloud Compute Console project cloud computing, web engineering, authentication, database design,
+          API security এবং VM infrastructure integration-এর একটি practical combination। এটি EC2-style compute console-এর
+          core workflow শেখায়, কিন্তু vendor lock-in ছাড়া Ubuntu Multipass-based local/private environment target করে।
+        </p>
+
+        <div class="box">
+          <h3>Final Summary</h3>
+          <p>
+            এই project-এর সবচেয়ে শক্তিশালী দিক হলো: browser directly host command চালায় না, backend permission check করে,
+            database ownership রাখে, audit log রাখে, এবং Multipass unavailable হলেও app crash করে না। তাই এটি শুধু UI
+            project নয়; এটি secure cloud control-plane architecture-এর prototype।
+          </p>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

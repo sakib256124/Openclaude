@@ -27,7 +27,7 @@ export default async function ResetPasswordPage({ searchParams }: ResetPasswordP
           <LogoMark />
           <div>
             <h1 className="text-xl font-semibold">Set a new password</h1>
-            <p className="text-sm text-muted-foreground">Use a minimum of 12 characters.</p>
+            <p className="text-sm text-muted-foreground">Use a minimum of 5 characters.</p>
           </div>
         </div>
         <ResetPasswordForm token={params?.token ?? ""} />

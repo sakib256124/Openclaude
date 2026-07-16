@@ -141,7 +141,7 @@ export function UsersManagement({
   }
 
   async function resetPassword(user: ManagedUser) {
-    const password = window.prompt(`Enter a new temporary password for ${user.email}. Minimum 12 characters.`);
+    const password = window.prompt(`Enter a new temporary password for ${user.email}. Minimum 5 characters.`);
 
     if (!password) {
       return;

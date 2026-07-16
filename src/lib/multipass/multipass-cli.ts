@@ -1,5 +1,8 @@
 import "server-only";
 import { execFile } from "node:child_process";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { promisify } from "node:util";
 import { OpenCloudError } from "@/lib/multipass/errors";
 import type { MultipassAction, MultipassHealth, MultipassInstance, MultipassLaunchInput } from "@/lib/multipass/types";
@@ -62,6 +65,32 @@ function normalizeListItem(item: {
     ipv4: Array.isArray(item.ipv4) ? item.ipv4 : item.ipv4 ? [item.ipv4] : [],
     release: item.release,
     imageHash: item.image_hash
+  };
+}
+
+function looksLikeInlineCloudInit(value: string) {
+  return value.includes("\n") || value.startsWith("#cloud-config") || value.startsWith("#!/") || value.startsWith("packages:");
+}
+
+async function prepareCloudInit(value?: string) {
+  if (!value) {
+    return null;
+  }
+
+  if (!looksLikeInlineCloudInit(value)) {
+    return { path: value, cleanup: async () => undefined };
+  }
+
+  const directory = await mkdtemp(join(tmpdir(), "opencloud-cloud-init-"));
+  const path = join(directory, "user-data.yaml");
+
+  await writeFile(path, value, "utf8");
+
+  return {
+    path,
+    cleanup: async () => {
+      await rm(directory, { force: true, recursive: true });
+    }
   };
 }
 
@@ -129,6 +158,7 @@ export async function getMultipassInstance(name: string): Promise<MultipassInsta
 
 export async function launchMultipassInstance(input: MultipassLaunchInput) {
   const args = ["launch", input.image || process.env.MULTIPASS_DEFAULT_IMAGE || "24.04", "--name", input.name];
+  const cloudInit = await prepareCloudInit(input.cloudInit);
 
   if (input.cpus) {
     args.push("--cpus", String(input.cpus));
@@ -142,12 +172,16 @@ export async function launchMultipassInstance(input: MultipassLaunchInput) {
     args.push("--disk", input.disk);
   }
 
-  if (input.cloudInit) {
-    args.push("--cloud-init", input.cloudInit);
+  if (cloudInit) {
+    args.push("--cloud-init", cloudInit.path);
   }
 
-  await runMultipassCommand(args, Number(process.env.MULTIPASS_LAUNCH_TIMEOUT_MS ?? 180_000));
-  return getMultipassInstance(input.name);
+  try {
+    await runMultipassCommand(args, Number(process.env.MULTIPASS_LAUNCH_TIMEOUT_MS ?? 180_000));
+    return getMultipassInstance(input.name);
+  } finally {
+    await cloudInit?.cleanup();
+  }
 }
 
 export async function runMultipassInstanceAction(name: string, action: MultipassAction) {

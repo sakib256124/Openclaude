@@ -7,52 +7,43 @@ loadEnvConfig(process.cwd());
 const prisma = new PrismaClient();
 
 async function main() {
-  const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "admin@opencloud.local";
-  const adminName = process.env.SEED_ADMIN_NAME ?? "OpenCloud Admin";
-  const adminPassword = process.env.SEED_ADMIN_PASSWORD;
   const demoUsers = [
     {
-      email: "rakib@gmail.com",
-      name: "Rakib",
-      password: "111111",
+      email: "admin@gmai.com",
+      name: "OpenCloud Admin",
+      password: "11111",
+      role: Role.ADMIN
+    },
+    {
+      email: "dev1@gmail.com",
+      name: "Developer One",
+      password: "11111",
       role: Role.DEVELOPER
     },
     {
-      email: "rimon@gmail.com",
-      name: "Rimon",
-      password: "111111",
+      email: "dev2@gmail.com",
+      name: "Developer Two",
+      password: "11111",
+      role: Role.DEVELOPER
+    },
+    {
+      email: "user2@gmail.com",
+      name: "Viewer User",
+      password: "11111",
       role: Role.VIEWER
     }
   ];
 
-  if (adminPassword) {
-    const passwordHash = await bcrypt.hash(adminPassword, 12);
-
-    await prisma.user.upsert({
-      where: { email: adminEmail },
-      update: {
-        name: adminName,
-        passwordHash,
-        role: Role.ADMIN,
-        isActive: true
-      },
-      create: {
-        email: adminEmail,
-        name: adminName,
-        passwordHash,
-        role: Role.ADMIN,
-        preferences: {
-          create: {
-            theme: "dark",
-            sidebarCollapsed: false,
-            tableDensity: "comfortable",
-            defaultRefreshSeconds: 15,
-            tablePageSize: 20
-          }
-        }
+  await prisma.user.updateMany({
+    where: {
+      email: {
+        in: ["rakib@gmail.com", "rimon@gmail.com", "user1@gmail.com"]
       }
-    });
-  }
+    },
+    data: {
+      isActive: false
+    }
+  });
 
   for (const demoUser of demoUsers) {
     const passwordHash = await bcrypt.hash(demoUser.password, 12);

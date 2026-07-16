@@ -19,7 +19,34 @@ type TopbarProps = {
 
 export function Topbar({ user, notificationCount, onOpenMobileNav }: TopbarProps) {
   const [userMenuOpen, setUserMenuOpen] = React.useState(false);
+  const userMenuRef = React.useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  React.useEffect(() => {
+    function onPointerDown(event: PointerEvent) {
+      if (!userMenuRef.current) {
+        return;
+      }
+
+      if (!userMenuRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    }
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setUserMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, []);
 
   return (
     <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b bg-background/95 px-4 backdrop-blur sm:h-16 lg:px-6">
@@ -37,13 +64,17 @@ export function Topbar({ user, notificationCount, onOpenMobileNav }: TopbarProps
 
       <div className="flex items-center gap-2">
         <div className="hidden items-center gap-2 lg:flex">
-          <Button variant="secondary" size="sm" disabled>
-            <Cloud />
-            localhost
+          <Button asChild variant="secondary" size="sm">
+            <Link href="/settings/multipass">
+              <Cloud />
+              localhost
+            </Link>
           </Button>
-          <Button variant="secondary" size="sm" disabled>
-            <Folder />
-            Ubuntu Lab
+          <Button asChild variant="secondary" size="sm">
+            <Link href="/instances">
+              <Folder />
+              Ubuntu Lab
+            </Link>
           </Button>
           <ConnectionBadge status="not-configured" />
         </div>
@@ -58,7 +89,7 @@ export function Topbar({ user, notificationCount, onOpenMobileNav }: TopbarProps
             </span>
           ) : null}
         </Button>
-        <div className="relative">
+        <div ref={userMenuRef} className="relative">
           <Button
             variant="secondary"
             size="sm"
@@ -80,7 +111,7 @@ export function Topbar({ user, notificationCount, onOpenMobileNav }: TopbarProps
                 </div>
               </div>
               <Button asChild className="mt-3 w-full justify-start" variant="ghost" size="sm">
-                <Link href="/profile">
+                <Link href="/profile" onClick={() => setUserMenuOpen(false)}>
                   <UserCircle />
                   Profile
                 </Link>
@@ -89,7 +120,10 @@ export function Topbar({ user, notificationCount, onOpenMobileNav }: TopbarProps
                 className="mt-3 w-full justify-start"
                 variant="ghost"
                 size="sm"
-                onClick={() => signOut({ callbackUrl: "/login" })}
+                onClick={() => {
+                  setUserMenuOpen(false);
+                  signOut({ callbackUrl: "/login" });
+                }}
               >
                 <LogOut />
                 Sign out

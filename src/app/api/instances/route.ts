@@ -13,7 +13,15 @@ const launchSchema = z.object({
   cpus: z.coerce.number().int().min(1).max(8).optional(),
   memory: z.string().trim().regex(/^\d+[MG]$/i).optional(),
   disk: z.string().trim().regex(/^\d+[MG]$/i).optional(),
-  cloudInit: z.string().trim().min(1).optional()
+  cloudInit: z.string().trim().min(1).max(16_000).optional(),
+  description: z.string().trim().max(240).optional(),
+  availabilityZone: z.string().trim().max(80).optional(),
+  instanceType: z.string().trim().max(40).optional(),
+  operatingSystem: z.string().trim().max(80).optional(),
+  networkId: z.string().trim().max(80).optional(),
+  subnetId: z.string().trim().max(80).optional(),
+  securityGroupId: z.string().trim().max(80).optional(),
+  keyPairName: z.string().trim().max(120).optional()
 });
 
 export async function GET() {

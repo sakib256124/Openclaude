@@ -6,13 +6,26 @@ import { Eye, EyeOff, Loader2, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function RegisterForm({ callbackUrl }: { callbackUrl: string }) {
-  const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [pending, setPending] = React.useState(false);
+
+  function registrationErrorMessage(payload: {
+    error?: {
+      message?: string;
+      fieldErrors?: Record<string, string[] | undefined>;
+    };
+  }) {
+    const fieldErrors = payload.error?.fieldErrors;
+    const firstFieldError = fieldErrors
+      ? Object.values(fieldErrors).flat().find((message): message is string => Boolean(message))
+      : null;
+
+    return firstFieldError ?? payload.error?.message ?? "Registration failed.";
+  }
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -28,13 +41,13 @@ export function RegisterForm({ callbackUrl }: { callbackUrl: string }) {
     const response = await fetch("/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password })
+      body: JSON.stringify({ email, password })
     });
     const payload = await response.json().catch(() => ({}));
 
     if (!response.ok) {
       setPending(false);
-      setError(payload.error?.message ?? "Registration failed.");
+      setError(registrationErrorMessage(payload));
       return;
     }
 
@@ -58,19 +71,6 @@ export function RegisterForm({ callbackUrl }: { callbackUrl: string }) {
   return (
     <form className="space-y-4" onSubmit={onSubmit}>
       <div className="space-y-2">
-        <label className="block text-sm font-medium" htmlFor="name">
-          Name
-        </label>
-        <input
-          id="name"
-          className="h-10 w-full rounded-md border bg-background px-3 text-sm outline-none ring-primary transition focus:ring-2"
-          placeholder="OpenCloud user"
-          autoComplete="name"
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-        />
-      </div>
-      <div className="space-y-2">
         <label className="block text-sm font-medium" htmlFor="email">
           Email
         </label>
@@ -84,6 +84,7 @@ export function RegisterForm({ callbackUrl }: { callbackUrl: string }) {
           required
         />
       </div>
+      <p className="text-xs text-muted-foreground">Name will be created automatically from your email.</p>
       <div className="space-y-2">
         <label className="block text-sm font-medium" htmlFor="password">
           Password
@@ -107,6 +108,7 @@ export function RegisterForm({ callbackUrl }: { callbackUrl: string }) {
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
+        <p className="text-xs text-muted-foreground">Minimum 5 characters.</p>
       </div>
       <div className="space-y-2">
         <label className="block text-sm font-medium" htmlFor="confirmPassword">

@@ -20,6 +20,7 @@ export async function middleware(request: NextRequest) {
 
   if (
     ignoredPathPrefixes.some((prefix) => pathname.startsWith(prefix)) ||
+    pathname === "/" ||
     publicPathPrefixes.some((prefix) => pathname.startsWith(prefix))
   ) {
     return withSecurityHeaders(NextResponse.next());

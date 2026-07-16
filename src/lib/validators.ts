@@ -12,7 +12,7 @@ const optionalNullableNameSchema = z.preprocess(
   z.string().trim().min(1).max(120).nullable().optional()
 );
 const emailSchema = z.string().trim().email().max(255).transform((value) => value.toLowerCase());
-const passwordSchema = z.string().min(12).max(128);
+const passwordSchema = z.string().min(5, "Password must be at least 5 characters.").max(128);
 
 export const serverEnvSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
