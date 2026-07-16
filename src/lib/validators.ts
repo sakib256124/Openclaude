@@ -3,6 +3,17 @@ import { z } from "zod";
 export const multipassDriverSchema = z.enum(["qemu", "lxd", "hyperv", "virtualbox"]);
 export const roleSchema = z.enum(["ADMIN", "DEVELOPER", "USER", "VIEWER"]);
 
+const optionalNameSchema = z.preprocess(
+  (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+  z.string().trim().min(1).max(120).optional()
+);
+const optionalNullableNameSchema = z.preprocess(
+  (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+  z.string().trim().min(1).max(120).nullable().optional()
+);
+const emailSchema = z.string().trim().email().max(255).transform((value) => value.toLowerCase());
+const passwordSchema = z.string().min(12).max(128);
+
 export const serverEnvSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   APP_URL: z.string().url(),
@@ -26,22 +37,28 @@ export const serverEnvSchema = z.object({
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
 
 export const createUserSchema = z.object({
-  name: z.string().trim().min(1).max(120).optional(),
-  email: z.string().trim().email().max(255).transform((value) => value.toLowerCase()),
-  password: z.string().min(12).max(128),
+  name: optionalNameSchema,
+  email: emailSchema,
+  password: passwordSchema,
   role: roleSchema.default("DEVELOPER"),
   isActive: z.boolean().default(true)
 });
 
+export const registerUserSchema = z.object({
+  name: optionalNameSchema,
+  email: emailSchema,
+  password: passwordSchema
+});
+
 export const updateUserSchema = z.object({
-  name: z.string().trim().min(1).max(120).nullable().optional(),
-  email: z.string().trim().email().max(255).transform((value) => value.toLowerCase()).optional(),
+  name: optionalNullableNameSchema,
+  email: emailSchema.optional(),
   role: roleSchema.optional(),
   isActive: z.boolean().optional()
 });
 
 export const resetPasswordSchema = z.object({
-  password: z.string().min(12).max(128)
+  password: passwordSchema
 });
 
 export const generalSettingsSchema = z.object({

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { hashPassword, verifyPassword } from "../../src/lib/password";
 import { hasPermission } from "../../src/lib/permissions";
-import { createUserSchema, generalSettingsSchema } from "../../src/lib/validators";
+import { createUserSchema, generalSettingsSchema, registerUserSchema } from "../../src/lib/validators";
 
 describe("Phase 2 authentication and authorization helpers", () => {
   it("hashes passwords without storing plaintext and verifies matches", async () => {
@@ -36,5 +36,20 @@ describe("Phase 2 authentication and authorization helpers", () => {
         dateTimeFormat: "yyyy-MM-dd HH:mm"
       }).success
     ).toBe(true);
+
+    const registeredUser = registerUserSchema.safeParse({
+      name: "",
+      email: "NEW@EXAMPLE.COM",
+      password: "long-enough-password"
+    });
+
+    expect(registeredUser.success).toBe(true);
+    if (!registeredUser.success) {
+      throw new Error("Expected register user payload to be valid.");
+    }
+    expect(registeredUser.data).toMatchObject({
+      name: undefined,
+      email: "new@example.com"
+    });
   });
 });
