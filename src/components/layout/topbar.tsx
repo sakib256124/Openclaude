@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { Bell, ChevronDown, Cloud, Folder, LogOut, Menu, RefreshCw, UserCircle } from "lucide-react";
 import * as React from "react";
@@ -18,6 +19,7 @@ type TopbarProps = {
 
 export function Topbar({ user, notificationCount, onOpenMobileNav }: TopbarProps) {
   const [userMenuOpen, setUserMenuOpen] = React.useState(false);
+  const router = useRouter();
 
   return (
     <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b bg-background/95 px-4 backdrop-blur sm:h-16 lg:px-6">
@@ -45,7 +47,7 @@ export function Topbar({ user, notificationCount, onOpenMobileNav }: TopbarProps
           </Button>
           <ConnectionBadge status="not-configured" />
         </div>
-        <Button variant="ghost" size="icon" aria-label="Refresh current page" disabled>
+        <Button variant="ghost" size="icon" aria-label="Refresh current page" onClick={() => router.refresh()}>
           <RefreshCw />
         </Button>
         <Button className="relative" variant="ghost" size="icon" aria-label="Notifications">

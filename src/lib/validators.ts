@@ -61,6 +61,15 @@ export const resetPasswordSchema = z.object({
   password: passwordSchema
 });
 
+export const forgotPasswordSchema = z.object({
+  email: emailSchema
+});
+
+export const completePasswordResetSchema = z.object({
+  token: z.string().trim().min(32).max(256),
+  password: passwordSchema
+});
+
 export const generalSettingsSchema = z.object({
   defaultPageSize: z.coerce.number().int().min(5).max(100),
   defaultRegion: z.string().trim().max(120).nullable().optional(),

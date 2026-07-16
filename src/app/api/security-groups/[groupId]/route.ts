@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireApiPermission } from "@/app/api/_utils/auth";
+import { ownedWhere } from "@/lib/cloud/ownership";
 import { prisma } from "@/lib/prisma";
 
 type Params = {
@@ -17,7 +18,7 @@ export async function DELETE(_request: Request, { params }: Params) {
 
   try {
     const result = await prisma.securityGroup.updateMany({
-      where: { OR: [{ id: groupId }, { groupId }] },
+      where: { AND: [{ OR: [{ id: groupId }, { groupId }] }, ownedWhere(auth.user)] },
       data: { status: "DELETED" }
     });
 

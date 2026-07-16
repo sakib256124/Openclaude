@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireApiPermission } from "@/app/api/_utils/auth";
+import { ownedWhere } from "@/lib/cloud/ownership";
 import { createCloudResourceId } from "@/lib/cloud/resource-ids";
 import { prisma } from "@/lib/prisma";
 
@@ -36,7 +37,7 @@ export async function POST(request: Request, { params }: Params) {
 
   try {
     const securityGroup = await prisma.securityGroup.findFirst({
-      where: { OR: [{ id: groupId }, { groupId }] }
+      where: { AND: [{ OR: [{ id: groupId }, { groupId }] }, ownedWhere(auth.user)] }
     });
 
     if (!securityGroup) {

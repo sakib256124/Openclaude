@@ -55,7 +55,11 @@ export async function POST(request: Request) {
 
   try {
     const network = parsed.data.networkId
-      ? await prisma.virtualNetwork.findFirst({ where: { OR: [{ id: parsed.data.networkId }, { networkId: parsed.data.networkId }] } })
+      ? await prisma.virtualNetwork.findFirst({
+          where: {
+            AND: [{ OR: [{ id: parsed.data.networkId }, { networkId: parsed.data.networkId }] }, ownedWhere(auth.user)]
+          }
+        })
       : null;
     const floatingIp = await prisma.elasticIpAddress.create({
       data: {

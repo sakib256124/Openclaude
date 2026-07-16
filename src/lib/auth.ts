@@ -39,9 +39,7 @@ type AppJwtFields = {
 };
 
 function getLocalUser(email: string, password: string) {
-  const allowAnyLocalLogin =
-    process.env.LOCAL_DEMO_LOGIN_ANY === "true" ||
-    (process.env.NODE_ENV !== "production" && process.env.LOCAL_DEMO_LOGIN_ANY !== "false");
+  const allowAnyLocalLogin = process.env.LOCAL_DEMO_LOGIN_ANY === "true";
 
   if (!allowAnyLocalLogin || !email || !password) {
     return null;

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireApiPermission } from "@/app/api/_utils/auth";
+import { ownedWhere } from "@/lib/cloud/ownership";
 import { prisma } from "@/lib/prisma";
 
 type Params = {
@@ -13,11 +14,20 @@ export async function DELETE(_request: Request, { params }: Params) {
     return auth.response;
   }
 
-  const { ruleId } = await params;
+  const { groupId, ruleId } = await params;
 
   try {
     const rule = await prisma.firewallRule.deleteMany({
-      where: { OR: [{ id: ruleId }, { ruleId }] }
+      where: {
+        AND: [
+          { OR: [{ id: ruleId }, { ruleId }] },
+          {
+            securityGroup: {
+              AND: [{ OR: [{ id: groupId }, { groupId }] }, ownedWhere(auth.user)]
+            }
+          }
+        ]
+      }
     });
 
     return NextResponse.json({ ok: rule.count > 0 });

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireApiPermission } from "@/app/api/_utils/auth";
+import { ownedWhere } from "@/lib/cloud/ownership";
 import { prisma } from "@/lib/prisma";
 
 type Params = {
@@ -17,7 +18,7 @@ export async function POST(_request: Request, { params }: Params) {
 
   try {
     const volume = await prisma.volume.updateMany({
-      where: { OR: [{ id: volumeId }, { volumeId }] },
+      where: { AND: [{ OR: [{ id: volumeId }, { volumeId }] }, ownedWhere(auth.user)] },
       data: {
         status: "AVAILABLE",
         attachedInstanceId: null,

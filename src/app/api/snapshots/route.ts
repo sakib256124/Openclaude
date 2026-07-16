@@ -60,11 +60,23 @@ export async function POST(request: Request) {
 
   try {
     const volume = parsed.data.volumeId
-      ? await prisma.volume.findFirst({ where: { OR: [{ id: parsed.data.volumeId }, { volumeId: parsed.data.volumeId }, { name: parsed.data.volumeId }] } })
+      ? await prisma.volume.findFirst({
+          where: {
+            AND: [
+              { OR: [{ id: parsed.data.volumeId }, { volumeId: parsed.data.volumeId }, { name: parsed.data.volumeId }] },
+              ownedWhere(auth.user)
+            ]
+          }
+        })
       : null;
     const instance = parsed.data.instanceId
       ? await prisma.computeInstance.findFirst({
-          where: { OR: [{ id: parsed.data.instanceId }, { instanceId: parsed.data.instanceId }, { multipassName: parsed.data.instanceId }] }
+          where: {
+            AND: [
+              { OR: [{ id: parsed.data.instanceId }, { instanceId: parsed.data.instanceId }, { multipassName: parsed.data.instanceId }] },
+              ownedWhere(auth.user)
+            ]
+          }
         })
       : null;
 

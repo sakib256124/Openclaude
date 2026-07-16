@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import * as React from "react";
 import { signIn } from "next-auth/react";
 import { Eye, EyeOff, Loader2, LogIn } from "lucide-react";
@@ -51,9 +52,14 @@ export function LoginForm({ callbackUrl }: { callbackUrl: string }) {
         />
       </div>
       <div className="space-y-2">
-        <label className="block text-sm font-medium" htmlFor="password">
-          Password
-        </label>
+        <div className="flex items-center justify-between gap-3">
+          <label className="block text-sm font-medium" htmlFor="password">
+            Password
+          </label>
+          <Link className="text-xs font-medium text-primary hover:underline" href="/forgot-password">
+            Forgot password?
+          </Link>
+        </div>
         <div className="relative">
           <input
             id="password"

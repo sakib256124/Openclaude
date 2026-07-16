@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { hashPassword, verifyPassword } from "../../src/lib/password";
 import { hasPermission } from "../../src/lib/permissions";
-import { createUserSchema, generalSettingsSchema, registerUserSchema } from "../../src/lib/validators";
+import {
+  completePasswordResetSchema,
+  createUserSchema,
+  forgotPasswordSchema,
+  generalSettingsSchema,
+  registerUserSchema
+} from "../../src/lib/validators";
 
 describe("Phase 2 authentication and authorization helpers", () => {
   it("hashes passwords without storing plaintext and verifies matches", async () => {
@@ -51,5 +57,13 @@ describe("Phase 2 authentication and authorization helpers", () => {
       name: undefined,
       email: "new@example.com"
     });
+
+    expect(forgotPasswordSchema.safeParse({ email: "RESET@EXAMPLE.COM" }).success).toBe(true);
+    expect(
+      completePasswordResetSchema.safeParse({
+        token: "a".repeat(32),
+        password: "long-enough-password"
+      }).success
+    ).toBe(true);
   });
 });

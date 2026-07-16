@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireApiPermission } from "@/app/api/_utils/auth";
+import { ownedWhere } from "@/lib/cloud/ownership";
 import { prisma } from "@/lib/prisma";
 
 const attachSchema = z.object({
@@ -31,7 +32,12 @@ export async function POST(request: Request, { params }: Params) {
 
   try {
     const instance = await prisma.computeInstance.findFirst({
-      where: { OR: [{ id: parsed.data.instanceId }, { instanceId: parsed.data.instanceId }, { multipassName: parsed.data.instanceId }] }
+      where: {
+        AND: [
+          { OR: [{ id: parsed.data.instanceId }, { instanceId: parsed.data.instanceId }, { multipassName: parsed.data.instanceId }] },
+          ownedWhere(auth.user)
+        ]
+      }
     });
 
     if (!instance) {
@@ -39,7 +45,7 @@ export async function POST(request: Request, { params }: Params) {
     }
 
     const volume = await prisma.volume.updateMany({
-      where: { OR: [{ id: volumeId }, { volumeId }] },
+      where: { AND: [{ OR: [{ id: volumeId }, { volumeId }] }, ownedWhere(auth.user)] },
       data: {
         status: "IN_USE",
         attachedInstanceId: instance.id,

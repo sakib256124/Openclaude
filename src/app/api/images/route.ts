@@ -82,7 +82,10 @@ export async function POST(request: Request) {
     const sourceInstance = parsed.data.sourceInstanceId
       ? await prisma.computeInstance.findFirst({
           where: {
-            OR: [{ id: parsed.data.sourceInstanceId }, { instanceId: parsed.data.sourceInstanceId }, { multipassName: parsed.data.sourceInstanceId }]
+            AND: [
+              { OR: [{ id: parsed.data.sourceInstanceId }, { instanceId: parsed.data.sourceInstanceId }, { multipassName: parsed.data.sourceInstanceId }] },
+              ownedWhere(auth.user)
+            ]
           }
         })
       : null;

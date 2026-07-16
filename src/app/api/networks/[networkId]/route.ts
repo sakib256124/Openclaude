@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireApiPermission } from "@/app/api/_utils/auth";
+import { ownedWhere } from "@/lib/cloud/ownership";
 import { prisma } from "@/lib/prisma";
 
 type Params = {
@@ -17,7 +18,7 @@ export async function DELETE(_request: Request, { params }: Params) {
 
   try {
     const result = await prisma.virtualNetwork.updateMany({
-      where: { OR: [{ id: networkId }, { networkId }] },
+      where: { AND: [{ OR: [{ id: networkId }, { networkId }] }, ownedWhere(auth.user)] },
       data: { status: "DELETED" }
     });
 

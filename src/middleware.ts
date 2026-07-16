@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const publicPathPrefixes = ["/login", "/register", "/api/auth"];
+const publicPathPrefixes = ["/login", "/register", "/forgot-password", "/reset-password", "/api/auth", "/api/password"];
 const ignoredPathPrefixes = ["/_next", "/favicon.ico", "/logo.svg"];
 
 function withSecurityHeaders(response: NextResponse) {

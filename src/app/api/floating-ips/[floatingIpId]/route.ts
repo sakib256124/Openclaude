@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireApiPermission } from "@/app/api/_utils/auth";
+import { ownedWhere } from "@/lib/cloud/ownership";
 import { prisma } from "@/lib/prisma";
 
 const updateFloatingIpSchema = z.object({
@@ -31,11 +32,16 @@ export async function PATCH(request: Request, { params }: Params) {
   try {
     const instance = parsed.data.instanceId
       ? await prisma.computeInstance.findFirst({
-          where: { OR: [{ id: parsed.data.instanceId }, { instanceId: parsed.data.instanceId }, { multipassName: parsed.data.instanceId }] }
+          where: {
+            AND: [
+              { OR: [{ id: parsed.data.instanceId }, { instanceId: parsed.data.instanceId }, { multipassName: parsed.data.instanceId }] },
+              ownedWhere(auth.user)
+            ]
+          }
         })
       : null;
     const floatingIp = await prisma.elasticIpAddress.updateMany({
-      where: { OR: [{ id: floatingIpId }, { allocationId: floatingIpId }, { publicIp: floatingIpId }] },
+      where: { AND: [{ OR: [{ id: floatingIpId }, { allocationId: floatingIpId }, { publicIp: floatingIpId }] }, ownedWhere(auth.user)] },
       data: {
         instanceId: instance?.id ?? null,
         status: instance ? "ASSOCIATED" : "AVAILABLE"
@@ -62,7 +68,7 @@ export async function DELETE(_request: Request, { params }: Params) {
 
   try {
     const floatingIp = await prisma.elasticIpAddress.updateMany({
-      where: { OR: [{ id: floatingIpId }, { allocationId: floatingIpId }, { publicIp: floatingIpId }] },
+      where: { AND: [{ OR: [{ id: floatingIpId }, { allocationId: floatingIpId }, { publicIp: floatingIpId }] }, ownedWhere(auth.user)] },
       data: {
         instanceId: null,
         status: "RELEASED"

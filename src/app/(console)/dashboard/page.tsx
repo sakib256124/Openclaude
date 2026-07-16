@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Activity, Cpu, Database, Network, Server } from "lucide-react";
+import { Activity, Cpu, Database, DollarSign, HardDrive, Network, Server } from "lucide-react";
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,34 +14,58 @@ import { StatusBadge } from "@/components/ui/status-badge";
 type Instance = {
   name: string;
   state?: string;
+  status?: string;
   ipv4?: string[];
-  memoryUsage?: string;
+  instanceId?: string;
+  cpu?: number;
+  ramMb?: number;
+  storageGb?: number;
+};
+
+type DashboardPayload = {
+  source?: "local" | "multipass";
+  metrics?: Array<{ title: string; value: string; helper: string }>;
+  quotas?: Array<{ label: string; used: number; limit: number }>;
+  recentInstances?: Instance[];
+  recentActivity?: Array<{
+    id: string;
+    action: string;
+    resourceType: string;
+    resourceName: string | null;
+    status: string;
+    safeMessage: string;
+    createdAt: string;
+  }>;
+  services?: Array<{ service: string; status: string; endpoint: string; latency: string }>;
 };
 
 export default function DashboardPage() {
-  const [instances, setInstances] = React.useState<Instance[]>([]);
+  const [payload, setPayload] = React.useState<DashboardPayload>({});
+  const [loading, setLoading] = React.useState(true);
+  const [lastUpdated, setLastUpdated] = React.useState<Date | null>(null);
 
-  React.useEffect(() => {
-    fetch("/api/instances", { cache: "no-store" })
-      .then((response) => response.ok ? response.json() : { instances: [] })
-      .then((data) => setInstances(Array.isArray(data.instances) ? data.instances : []))
-      .catch(() => setInstances([]));
+  const loadDashboard = React.useCallback(() => {
+    setLoading(true);
+    fetch("/api/dashboard", { cache: "no-store" })
+      .then((response) => response.ok ? response.json() : {})
+      .then((data) => {
+        setPayload(data);
+        setLastUpdated(new Date());
+      })
+      .catch(() => setPayload({}))
+      .finally(() => setLoading(false));
   }, []);
 
-  const running = instances.filter((instance) => instance.state === "Running").length;
-  const stopped = instances.filter((instance) => instance.state === "Stopped").length;
-  const building = instances.filter((instance) => instance.state === "Starting").length;
-  const metricIcons = [Server, Activity, Server, Activity, Cpu, Cpu, Database, Network];
-  const metrics = [
-    { title: "Total Instances", value: String(instances.length), helper: `${running} running, ${stopped} stopped, ${building} building` },
-    { title: "Running", value: String(running), helper: "Active workloads" },
-    { title: "Stopped", value: String(stopped), helper: "Stopped instances" },
-    { title: "Building", value: String(building), helper: "Recently created instances" },
-    { title: "Allocated vCPUs", value: instances.length ? String(instances.length * 2) : "0", helper: "Based on created instances" },
-    { title: "Allocated RAM", value: instances.length ? `${instances.length * 8} GB` : "0 GB", helper: "Based on launch configuration" },
-    { title: "Volume Storage", value: instances.length ? `${instances.length * 80} GB` : "0 GB", helper: "Boot disk total" },
-    { title: "Network Addresses", value: String(instances.filter((instance) => instance.ipv4?.length).length), helper: "Assigned addresses" }
-  ];
+  React.useEffect(() => {
+    loadDashboard();
+  }, [loadDashboard]);
+
+  const instances = payload.recentInstances ?? [];
+  const metrics = payload.metrics ?? [];
+  const quotas = payload.quotas ?? [];
+  const services = payload.services ?? [];
+  const activity = payload.recentActivity ?? [];
+  const metricIcons = [Server, Activity, Server, Activity, Cpu, Cpu, HardDrive, DollarSign, Database, Network];
 
   return (
     <div className="space-y-6">
@@ -50,9 +74,9 @@ export default function DashboardPage() {
         description="Current local VM resource overview."
         actions={
           <>
-            <LastUpdated value={new Date()} />
-            <RefreshButton />
-            <ConnectionBadge status="healthy" />
+            <LastUpdated value={lastUpdated ?? new Date()} />
+            <RefreshButton onRefresh={loadDashboard} disabled={loading} />
+            <ConnectionBadge status={payload.source === "multipass" ? "healthy" : "unavailable"} />
           </>
         }
       />
@@ -66,9 +90,11 @@ export default function DashboardPage() {
           <CardTitle>Quota usage</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          <QuotaProgress label="Instances" used={instances.length} limit={24} />
-          <QuotaProgress label="vCPUs" used={instances.length * 2} limit={96} />
-          <QuotaProgress label="RAM" used={instances.length * 8} limit={384} />
+          {quotas.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No quota data available.</p>
+          ) : quotas.map((quota) => (
+            <QuotaProgress key={quota.label} label={quota.label} used={quota.used} limit={quota.limit} />
+          ))}
         </CardContent>
       </Card>
       <section className="grid gap-4 xl:grid-cols-2">
@@ -82,7 +108,7 @@ export default function DashboardPage() {
             ) : instances.map((instance) => (
               <div key={instance.name} className="grid gap-3 rounded-md border bg-background p-3 text-sm md:grid-cols-[1.2fr_92px_1fr]">
                 <span className="font-medium">{instance.name}</span>
-                <StatusBadge status={instance.state === "Running" ? "ACTIVE" : instance.state ?? "UNKNOWN"} />
+                <StatusBadge status={instance.status ?? instance.state ?? "UNKNOWN"} />
                 <span className="font-mono text-xs text-muted-foreground">{instance.ipv4?.[0] ?? "-"}</span>
               </div>
             ))}
@@ -92,11 +118,39 @@ export default function DashboardPage() {
           <CardHeader>
             <CardTitle>Activity</CardTitle>
           </CardHeader>
-          <CardContent className="flex min-h-32 items-center text-sm text-muted-foreground">
-            Create or terminate resources to update this console.
+          <CardContent className="min-h-32 space-y-3 text-sm">
+            {activity.length === 0 ? (
+              <p className="text-muted-foreground">Create or terminate resources to update this console.</p>
+            ) : activity.map((item) => (
+              <div key={item.id} className="grid gap-2 rounded-md border bg-background p-3 md:grid-cols-[1fr_92px]">
+                <div>
+                  <div className="font-medium">{item.safeMessage}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {item.action} / {item.resourceName ?? item.resourceType}
+                  </div>
+                </div>
+                <StatusBadge status={item.status} />
+              </div>
+            ))}
           </CardContent>
         </Card>
       </section>
+      <Card>
+        <CardHeader>
+          <CardTitle>Services</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-3 md:grid-cols-2">
+          {services.map((service) => (
+            <div key={service.service} className="grid gap-2 rounded-md border bg-background p-3 text-sm md:grid-cols-[1fr_92px]">
+              <div>
+                <div className="font-medium">{service.service}</div>
+                <div className="text-xs text-muted-foreground">{service.endpoint} / {service.latency}</div>
+              </div>
+              <StatusBadge status={service.status} />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
     </div>
   );
 }

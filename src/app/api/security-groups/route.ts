@@ -53,7 +53,9 @@ export async function POST(request: Request) {
   try {
     const network = parsed.data.networkId
       ? await prisma.virtualNetwork.findFirst({
-          where: { OR: [{ id: parsed.data.networkId }, { networkId: parsed.data.networkId }] }
+          where: {
+            AND: [{ OR: [{ id: parsed.data.networkId }, { networkId: parsed.data.networkId }] }, ownedWhere(auth.user)]
+          }
         })
       : null;
     const securityGroup = await prisma.securityGroup.create({
